@@ -1,12 +1,15 @@
-<tr  class="itemRow $EvenOdd $FirstLast">
-	<td>
-		<% if Image %>
-			<div class="image">
+<tr class="itemRow $EvenOdd $FirstLast">
+	<td width="100">
+		<div class="image center">
+		<% if $Image %>
 				<a href="$Link" title="<% sprintf(_t("READMORE","View &quot;%s&quot;"),$Title) %>">
-					<img src="<% with Image.setWidth(45) %>$Me.AbsoluteURL<% end_with %>" alt="$Buyable.Title"/>
+					<img src="<% with $Image.setWidth(45) %>$Me.AbsoluteURL<% end_with %>" alt="$Buyable.Title" />
 				</a>
 			</div>
+		<% else %>
+			<img src="/app/images/no-product-photo.jpg" />
 		<% end_if %>
+		</div>
 	</td>
 	<td class="product title" scope="row">
 		<h3>

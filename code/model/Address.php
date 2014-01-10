@@ -143,7 +143,7 @@ class Address extends DataObject{
 	 * Get full name associated with this Address
 	 */
 	function getName(){
-		return implode('',array_filter(array(
+		return implode(' ',array_filter(array(
 			$this->FirstName,
 			$this->Surname
 		)));
