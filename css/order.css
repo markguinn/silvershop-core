@@ -4,6 +4,12 @@
 		border-bottom:1px solid #CDDDDD;
 		text-transform:uppercase;
 	}
+	#Form_ItemEditForm_Title, h4.subtitle {
+		padding-left:24px;
+	}
+	h4.subtitle {
+		margin-bottom:0px;
+	}
 	
 	#Content {
 		text-align:left;
