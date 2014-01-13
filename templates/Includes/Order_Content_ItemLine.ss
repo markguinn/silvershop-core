@@ -7,7 +7,7 @@
 				</a>
 			</div>
 		<% else %>
-			<img src="/app/images/no-product-photo.jpg" />
+			<img src="/shop/images/no-product-photo.jpg" />
 		<% end_if %>
 		</div>
 	</td>
