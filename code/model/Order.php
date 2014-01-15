@@ -180,10 +180,14 @@ class Order extends DataObject {
 	 */
 	function getCMSFields(){
 		$fields = new FieldList(new TabSet('Root',new Tab('Main')));
-		$fields->insertBefore(new HeaderField('Title',"Order #".$this->Reference),'Root');
-		$fields->insertBefore(new LiteralField('SubTitle',
-			"<h4 class=\"subtitle\">".$this->dbObject('Placed')->Nice()." - <a href=\"mailto:".$this->getLatestEmail()."\">".$this->getName()."</a></h4>"
-		),"Root");
+		$headingField = CompositeField::create(new FieldList(array(
+			HeaderField::create('Title',"Order #".$this->Reference),
+			LiteralField::create('SubTitle',
+			"<h4 class=\"subtitle\">".$this->dbObject('Placed')->Nice()." - <a href=\"mailto:".$this->getLatestEmail()."\">".$this->getName()."</a></h4>"),
+			FormAction::create('printInvoice', 'Print Invoice')->setUseButtonTag(true)->setAttribute('data-icon', 'grid_print'),
+			FormAction::create('printPackingSlip', 'Print Packing Slip')->setUseButtonTag(true)->setAttribute('data-icon', 'grid_print')
+		)))->addExtraClass('OrderHeading');
+		$fields->insertBefore($headingField,'Root');
 		Requirements::css(SHOP_DIR."/css/order.css");
 		$fields->addFieldsToTab('Root.Main', array(
 			new DropdownField("Status","Status", self::get_order_status_options()),
@@ -192,7 +196,8 @@ class Order extends DataObject {
 		$this->extend('updateCMSFields',$fields);
 		return $fields;
 	}
-
+	
+	
 	/**
 	 * Adjust scafolded search context
 	 * @return [type] [description]

@@ -4,11 +4,13 @@
 		border-bottom:1px solid #CDDDDD;
 		text-transform:uppercase;
 	}
-	#Form_ItemEditForm_Title, h4.subtitle {
-		padding-left:24px;
+	
+	.OrdersAdmin .ss-gridfield-table {
+		margin-top:20px;
 	}
-	h4.subtitle {
-		margin-bottom:0px;
+	
+	.OrderHeading {
+		padding-left:24px;
 	}
 	
 	#Content {
@@ -133,6 +135,10 @@
 		table.infotable .left,
 		table.infotable th {
 			text-align:left;
+		}
+		
+		#InformationTable .product-number {
+			display:none;	
 		}
 		
 		#ShippingTable td,

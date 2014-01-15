@@ -1,5 +1,6 @@
 <tr class="itemRow $EvenOdd $FirstLast">
-	<td width="100">
+	<td class="product-number">1234</td>
+	<td width="100" class="product-photo">
 		<div class="image center">
 		<% if $Image %>
 				<a href="$Link" title="<% sprintf(_t("READMORE","View &quot;%s&quot;"),$Title) %>">
