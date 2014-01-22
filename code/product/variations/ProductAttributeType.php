@@ -24,7 +24,13 @@ class ProductAttributeType extends DataObject{
 	static $default_sort = "ID ASC";
 
 	function getCMSFields(){
-		$fields = parent::getCMSFields();
+		$fields = $this->scaffoldFormFields(array(
+			// Don't allow has_many/many_many relationship editing before the record is first saved
+			'includeRelations' => ($this->ID > 0),
+			'tabbed' => true,
+			'ajaxSafe' => true
+		));
+
 		if($this->isInDB()){
 			$itemsConfig = new GridFieldConfig_RelationEditor();
 			$itemsTable = new GridField("Values","Values",$this->Values(),$itemsConfig);
@@ -32,6 +38,8 @@ class ProductAttributeType extends DataObject{
 			$itemsTable = new LiteralField("Values", "<p class=\"message warning\">Save first, then you can add values.</p>");
 		}
 		$fields->addFieldToTab("Root.Values", $itemsTable);
+
+		$this->extend('updateCMSFields', $fields);
 		return $fields;
 	}
 
