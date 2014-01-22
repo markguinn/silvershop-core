@@ -11,6 +11,14 @@
 		margin-bottom:0px;
 	}
 	
+	.OrdersAdmin .ss-gridfield-table {
+		margin-top:20px;
+	}
+	
+	.OrderHeading {
+		padding-left:24px;
+	}
+	
 	#Content {
 		text-align:left;
 		margin:auto;
@@ -133,6 +141,10 @@
 		table.infotable .left,
 		table.infotable th {
 			text-align:left;
+		}
+		
+		#InformationTable .product-number {
+			display:none;	
 		}
 		
 		#ShippingTable td,
