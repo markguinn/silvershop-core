@@ -9,8 +9,10 @@
 		<table id="OutstandingTable" class="infotable">
 			<tbody>
 				<tr class="gap summary" id="Outstanding">
-					<th colspan="4" scope="row" class="threeColHeader"><strong><% _t("TOTALOUTSTANDING","Total outstanding") %></strong></th>
-					<td class="right"><strong>$TotalOutstanding.Nice </strong></td>
+					<th><strong><% _t("TOTALOUTSTANDING","Total outstanding") %></strong></th>
+				</tr>
+				<tr>
+					<td><strong>$TotalOutstanding.Nice </strong></td>
 				</tr>
 			</tbody>
 		</table>

@@ -6,7 +6,8 @@
 	<colgroup class="total"/>
 	<thead>
 		<tr>
-			<th scope="col"></th>
+			<th class="product-number" scope="col">Number</th>
+			<th class="product-photo" scope="col"></th>
 			<th scope="col"><% _t("PRODUCT","Product") %></th>
 			<th scope="col"><% _t("UNITPRICE","Unit Price") %></th>
 			<th scope="col"><% _t("QUANTITY", "Quantity") %></th>

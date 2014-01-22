@@ -9,7 +9,6 @@ class OrdersAdmin extends ModelAdmin{
 	static $url_segment = 'orders';
 	static $menu_title = 'Orders';
 	static $menu_priority = 1;
-
 	public static $managed_models = array(
 		'Order' => array(
 			'title' => 'Orders'
