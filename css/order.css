@@ -4,14 +4,8 @@
 		border-bottom:1px solid #CDDDDD;
 		text-transform:uppercase;
 	}
-	#Form_ItemEditForm_Title, h4.subtitle {
-		padding-left:24px;
-	}
-	h4.subtitle {
-		margin-bottom:0px;
-	}
 	
-	.OrdersAdmin .ss-gridfield-table {
+	.DaywindOrdersAdmin .ss-gridfield-table {
 		margin-top:20px;
 	}
 	

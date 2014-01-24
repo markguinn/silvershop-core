@@ -184,8 +184,8 @@ class Order extends DataObject {
 			HeaderField::create('Title',"Order #".$this->Reference),
 			LiteralField::create('SubTitle',
 			"<h4 class=\"subtitle\">".$this->dbObject('Placed')->Nice()." - <a href=\"mailto:".$this->getLatestEmail()."\">".$this->getName()."</a></h4>"),
-			FormAction::create('printInvoice', 'Print Invoice')->setUseButtonTag(true)->setAttribute('data-icon', 'grid_print'),
-			FormAction::create('printPackingSlip', 'Print Packing Slip')->setUseButtonTag(true)->setAttribute('data-icon', 'grid_print')
+			FormAction::create('PrintInvoice', 'Print Invoice')->setUseButtonTag(true)->setAttribute('data-icon', 'grid_print'),
+			FormAction::create('PrintPackingSlip', 'Print Packing Slip')->setUseButtonTag(true)->setAttribute('data-icon', 'grid_print')->setAttribute('data-orderid', $this->ID)
 		)))->addExtraClass('OrderHeading');
 		$fields->insertBefore($headingField,'Root');
 		Requirements::css(SHOP_DIR."/css/order.css");

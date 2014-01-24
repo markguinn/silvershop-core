@@ -1,7 +1,7 @@
 (function($) {
  
     $.entwine('ss', function($){
-        $('.cms-edit-form #Form_ItemEditForm_action_printInvoice').entwine({
+        $('#Form_ItemEditForm_action_PrintInvoice').entwine({
 			onclick: function(e){
 				var $orderHeading = $('#Form_ItemEditForm_Title').html(),
 					$orderSubHeading = $('#Form_ItemEditForm_Title').next().html(),
@@ -20,6 +20,16 @@
 				return false;
 			}
 
+        });
+        
+        $('#Form_ItemEditForm_action_PrintPackingSlip').entwine({
+			onclick: function(e){
+				var	url = '/daywindorder/printpackingslip/' + $(this).data('orderid');
+		        var packingSlipWindow = window.open(url);
+		        packingSlipWindow.print();
+		        
+		        return false;
+	        }
         });
     });
  
