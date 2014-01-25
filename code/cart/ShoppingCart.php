@@ -359,7 +359,7 @@ class ShoppingCart_Controller extends Controller{
 		return "";
 	}
 	
-	static function direct($status = true){
+	static function direct($showCart = false, $status = true){
 		if(Director::is_ajax()){
 			return $status;
 		}
@@ -367,7 +367,12 @@ class ShoppingCart_Controller extends Controller{
 			Controller::curr()->redirect($cartlink);
 			return;
 		}else{
-			Controller::curr()->redirectBack();
+			if ($showCart) {
+				$referrer = $_SERVER['HTTP_REFERER']; 
+				Controller::curr()->redirect("$referrer?showcart=1");
+			} else {
+				Controller::curr()->redirectBack();
+			}
 			return;
 		}
 	}
@@ -412,7 +417,7 @@ class ShoppingCart_Controller extends Controller{
 			if(!$quantity) $quantity = 1;
 			$this->cart->add($product,$quantity,$request->getVars());
 		}
-		return self::direct();
+		return self::direct(true);
 	}
 	
 	function remove($request){
