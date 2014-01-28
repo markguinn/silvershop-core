@@ -171,6 +171,12 @@ class OrderItem extends OrderAttribute {
 		}
 		return null;
 	}
+	
+	function ProductThumb() {
+		$buyable = Product::get()->byID($this->Buyable()->ID);
+		$buyableImage = Image::get()->byID($buyable->ImageID);
+		return $buyableImage;
+	}
 
 	function TableTitle() {
 		return $this->i18n_singular_name();
