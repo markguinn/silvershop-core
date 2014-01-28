@@ -39,6 +39,12 @@ class AccountPage extends Page {
 		}
 		user_error('No AccountPage was found. Please create one in the CMS!', E_USER_ERROR);
 	}
+	
+	public function getAddresses() {
+		$memberID = Member::currentUserID();
+		return Address::get()->filter('MemberID', $memberID);
+	}
+	
 
 }
 
@@ -51,7 +57,10 @@ class AccountPage_Controller extends Page_Controller {
 		'DefaultAddressForm',
 		'editprofile',
 		'EditAccountForm',
-		'ChangePasswordForm'
+		'ChangePasswordForm',
+		'deleteaddress',
+		'setdefaultbilling',
+		'setdefaultshipping'
 	);
 	
 	protected $member;
@@ -145,6 +154,21 @@ class AccountPage_Controller extends Page_Controller {
 		$this->redirect($this->Link('addressbook'));
 	}
 	
+	function deleteaddress($req) {
+		$address = Address::get()->byID($req->param('ID'));
+		$address->MemberID = '0';
+		$address->write();
+		$this->redirectBack();
+	}
+	
+	function setdefaultbilling($req) {
+		$addressID = $req->param('ID');
+		$member = $this->member;
+		$member->DefaultBillingAddressID = $addressID;
+		$member->write();
+		$this->redirectBack();
+	}
+	
 	function editprofile(){
 		return array();
 	}
@@ -161,5 +185,5 @@ class AccountPage_Controller extends Page_Controller {
 	function ChangePasswordForm(){
 		return new ChangePasswordForm($this, "ChangePasswordForm");
 	}
-
+	
 }
