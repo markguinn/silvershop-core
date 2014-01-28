@@ -64,6 +64,10 @@ class ShopAccountForm extends Form {
 		Controller::curr()->redirect(CheckoutPage::find_link());
 		return true;
 	}
+	
+	public function forTemplate() {
+        return $this->renderWith(array($this->class, 'Form'));
+    }
 
 }
 

@@ -167,7 +167,7 @@ class OrderItem extends OrderAttribute {
 	 */
 	function Image(){
 		if(method_exists($this->Buyable(),'Image')){
-			return $this->Buyable()->Image();
+			return $this->Buyable()->ProductImage();
 		}
 		return null;
 	}
