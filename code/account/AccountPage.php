@@ -169,6 +169,14 @@ class AccountPage_Controller extends Page_Controller {
 		$this->redirectBack();
 	}
 	
+	function setdefaultshipping($req) {
+		$addressID = $req->param('ID');
+		$member = $this->member;
+		$member->DefaultShippingAddressID = $addressID;
+		$member->write();
+		$this->redirectBack();
+	}
+	
 	function editprofile(){
 		return array();
 	}
