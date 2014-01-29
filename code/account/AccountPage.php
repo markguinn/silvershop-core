@@ -63,6 +63,12 @@ class AccountPage_Controller extends Page_Controller {
 		'setdefaultshipping'
 	);
 	
+	private static $url_handlers = array(
+		'changepassword' => 'editprofile',
+		'login' => 'editprofile',
+	);
+	
+	
 	protected $member;
 	
 	public static $extensions = array(
