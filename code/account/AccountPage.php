@@ -131,6 +131,8 @@ class AccountPage_Controller extends Page_Controller {
 	
 	function CreateAddressForm(){
 		$fields = singleton('Address')->getFormFields();
+		$fields->insertBefore(TextField::create('FirstName'), 'Country');
+		$fields->insertBefore(TextField::create('Surname', 'Last Name'), 'Country');
 		$actions = new FieldList(
 			new FormAction("saveaddress","Save New Address")	
 		);
