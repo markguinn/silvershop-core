@@ -35,5 +35,12 @@ class Product_Image extends DataExtension {
 	public function getLargeImage() {
 		return $this->owner->SetWidth(self::$large_image_width);
 	}
+	
+	public function HasLargeImage() {
+		$dimensions = $this->owner->getCloudMeta('Dimensions');
+		$dimensions = explode("x",$dimensions);
+		$imageWidth = intval($dimensions[0]);
+		return $imageWidth > self::$large_image_width;
+	}
 
 }
