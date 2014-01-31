@@ -29,18 +29,19 @@ class Product_Image extends DataExtension {
 	}
 
 	public function getContentImage() {
-		return $this->owner->SetWidth(self::$content_image_width);
+//		return $this->owner->SetWidth(self::$content_image_width);
+		$dim = explode('x', $this->owner->getDimensions());
+		return ($dim[0] < self::$content_image_width && $dim[1] < self::$content_image_width)
+			? $this->owner
+			: $this->owner->SetRatioSize(self::$content_image_width, self::$content_image_width);
 	}
 
 	public function getLargeImage() {
-		return $this->owner->SetWidth(self::$large_image_width);
-	}
-	
-	public function HasLargeImage() {
-		$dimensions = $this->owner->getCloudMeta('Dimensions');
-		$dimensions = explode("x",$dimensions);
-		$imageWidth = intval($dimensions[0]);
-		return $imageWidth > self::$large_image_width;
+		//return $this->owner->SetWidth(self::$large_image_width);
+		$dim = explode('x', $this->owner->getDimensions());
+		return ($dim[0] < self::$large_image_width && $dim[1] < self::$large_image_width)
+			? $this->owner
+			: $this->owner->SetRatioSize(self::$large_image_width, self::$large_image_width);
 	}
 
 }
