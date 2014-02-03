@@ -44,4 +44,10 @@ class Product_Image extends DataExtension {
 			: $this->owner->SetRatioSize(self::$large_image_width, self::$large_image_width);
 	}
 
+	public function HasLargeImage() {
+		$imageWidth = $this->owner->getWidth();
+		$imageWidth = intval($imageWidth);
+		return $imageWidth > self::$large_image_width;
+	}
+
 }
