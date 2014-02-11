@@ -6,7 +6,7 @@
   *
   * @package shop
   */
-class ProductCategory extends Page {
+class ProductCategory extends Page implements HiddenClass {
 
 	public static $db = array(
 		'ChildGroupsPermission' => "Enum('Show Only Featured Products,Show All Products')"

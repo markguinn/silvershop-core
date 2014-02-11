@@ -12,7 +12,7 @@
  *
  * @package shop
  */
-class Product extends Page implements Buyable{
+class Product extends Page implements Buyable, HiddenClass {
 
 	public static $db = array(
 		'InternalItemID' => 'Varchar(30)', //ie SKU, ProductID etc (internal / existing recognition of product)
