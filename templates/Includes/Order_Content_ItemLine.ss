@@ -22,7 +22,6 @@
 		</h3>
 		<% if SubTitle %><p class="subtitle">$SubTitle</p><% end_if %>
 		<% if $Buyable.UPC %><p><strong>UPC:</strong> $Buyable.UPC</p><% end_if %>
-		<% if $Buyable.Product.UPC %><p><strong>UPC:</strong> $Buyable.Product.UPC</p><% end_if %>
 	</td>
 	<td class="center unitprice">$UnitPrice.Nice</td>
 	<td class="center quantity">$Quantity</td>
