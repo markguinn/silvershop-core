@@ -36,7 +36,8 @@ class Order extends DataObject {
 		'Notes' => 'Text',
 		'IPAddress' => 'Varchar(15)',
 		//separate shipping
-		'SeparateBillingAddress' => 'Boolean'
+		'SeparateBillingAddress' => 'Boolean',
+		'AdminNotes'        => 'Text',
 	);
 
 	private static $has_one = array(
@@ -183,7 +184,7 @@ class Order extends DataObject {
 		$headingField = CompositeField::create(new FieldList(array(
 			HeaderField::create('Title',"Order #".$this->Reference),
 			LiteralField::create('SubTitle',
-			"<h4 class=\"subtitle\">".$this->dbObject('Placed')->Nice()." - <a href=\"mailto:".$this->getLatestEmail()."\">".$this->getName()."</a></h4>"),
+			"<h4 class=\"subtitle\">".$this->dbObject('Placed')->Nice()." - <a href=\"mailto:".$this->getLatestEmail()."\">".$this->getName().' - '.$this->getLatestEmail()."</a></h4>"),
 			FormAction::create('PrintInvoice', 'Print Invoice')->setUseButtonTag(true)->setAttribute('data-icon', 'grid_print'),
 			FormAction::create('PrintPackingSlip', 'Print Packing Slip')->setUseButtonTag(true)->setAttribute('data-icon', 'grid_print')->setAttribute('data-orderid', $this->ID)
 		)))->addExtraClass('OrderHeading');
@@ -191,7 +192,8 @@ class Order extends DataObject {
 		Requirements::css(SHOP_DIR."/css/order.css");
 		$fields->addFieldsToTab('Root.Main', array(
 			new DropdownField("Status","Status", self::get_order_status_options()),
-			new LiteralField('MainDetails', $this->renderWith(self::$admin_template))
+			new LiteralField('MainDetails', $this->renderWith(self::$admin_template)),
+			TextareaField::create('AdminNotes', 'Administrative Notes (not visible to customer)')->addExtraClass('stacked'),
 		));
 		$this->extend('updateCMSFields',$fields);
 		return $fields;
