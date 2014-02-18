@@ -66,7 +66,7 @@ class ProductCategory extends Page implements HiddenClass {
 		self::$sort_options = $options;
 	}
 
-	function get_sort_options(){
+	static function get_sort_options(){
 		return self::$sort_options;
 	}
 
