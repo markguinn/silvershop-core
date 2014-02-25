@@ -120,5 +120,9 @@
 		#ShippingTable th{
 			width:50%;
 		}
+
+		.email-hidden {
+			display: none;
+		}
 -->
 </style>

@@ -251,8 +251,8 @@ class OrderProcessor{
 	* Send the receipt of the order by mail.
 	* Precondition: The order payment has been successful
 	*/
-	function sendReceipt() {
-		$this->sendEmail('Order_ReceiptEmail');
+	function sendReceipt($template = 'Order_ReceiptEmail') {
+		$this->sendEmail($template);
 		$this->order->ReceiptSent = SS_Datetime::now()->Rfc2822();
 		$this->order->write();
 	}
