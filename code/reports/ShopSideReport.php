@@ -118,3 +118,26 @@ class ShopSideReport_HeavyProducts extends SS_Report {
 		);
 	}
 }
+
+class ShopSideReport_StateTax extends SS_Report {
+    function title() {
+        // this is the title of the report
+        return "State Sales Tax";
+    }
+     
+    function sourceRecords($params = null) {
+        // the data the report returns all the dataobjects of type Page and sorted by title. See datamodel for more info
+        return Order::get()->filter('HasStateTax', '1');
+    }
+     
+    function columns() {
+        // fields you want to display. This will display a list of titles which link to the page in the cms. Handy!
+        return array(
+            "Reference" => "Reference",
+            "Placed" => "Placed",
+            "StateTaxAmount" => "Tax Amount",
+            "Total" => "Total"
+        );
+    }
+
+}
