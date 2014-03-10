@@ -1,5 +1,4 @@
 <style>
-<!--
 /** Global resetting for Design **/
 	html {
 		font-size:1em;
@@ -124,5 +123,4 @@
 		.email-hidden {
 			display: none;
 		}
--->
 </style>
