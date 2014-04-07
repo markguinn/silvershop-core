@@ -29,6 +29,48 @@ Shop has some built-in ajax functionality. It has the following goals/requiremen
 
 ## Server Side Usage
 
+The suggested usage is:
+
+```php
+	function add($request) {
+		// Do something...
+
+		if ($request->isAjax()) {
+			$response = new AjaxHTTPResponse();
+			$response->triggerEvent('cartchange');
+			$response->pushRegion('SideCart');
+			return $response;
+		} else {
+			return $this->redirectBack(); // or render or whatever
+		}
+	}
+```
+
+Within shop module the above is extracted into an extension. For example:
+
+```php
+class ShoppingCart_Controller {
+	function add($request) {
+		// Do something...
+
+		if ($request->isAjax()) {
+			$response = new AjaxHTTPResponse();
+			$this->extend('updateAddResponse', $response, $request, $success);
+			return $response;
+		} else {
+			return $this->redirectBack(); // or render or whatever
+		}
+	}
+}
+
+class ShoppingCartAjax extends Extension {
+	function updateAddResponse($response, $request) {
+		$response->triggerEvent('cartchange');
+		$response->pushRegion('SideCart');
+	}
+}
+```
+
 
 ## Conventions
 
