@@ -1,0 +1,5 @@
+/* This contains some styles for default ajax interactions (loading etc) but can be left out if you desire. */
+
+a.ajax-loading {
+	opacity: 0.5;
+}

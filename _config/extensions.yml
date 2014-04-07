@@ -12,6 +12,7 @@ Page_Controller:
 ShoppingCart_Controller:
   extensions:
     - ViewableCart
+    - ShoppingCartAjax
 CheckoutPage_Controller:
   extensions:
     - OrderManipulation
@@ -33,3 +34,6 @@ Payment:
 Order:
   extensions:
     - Payable
+Controller:
+  extensions:
+    - AjaxControllerExtension
