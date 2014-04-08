@@ -9,6 +9,11 @@
  */
 class AjaxResponseTest extends SapphireTest {
 
+	function setUpOnce() {
+		if (!Controller::has_extension('AjaxControllerExtension')) Controller::add_extension('AjaxControllerExtension');
+		parent::setUpOnce();
+	}
+
 	function testEmptyResponseJson() {
 		$r = new AjaxHTTPResponse();
 		$this->assertEquals('application/json', $r->getHeader('Content-type'));
@@ -39,7 +44,26 @@ class AjaxResponseTest extends SapphireTest {
 	}
 
 
-	// TODO: pull region
+	function testPullRegion() {
+		// this is a dirty dirty mess. sorry.
+		$req = new SS_HTTPRequest('GET', '/test1');
+		$req->addHeader(AjaxHTTPResponse::PULL_HEADER, 'SideCart,OrderHistory');
+		$req->addHeader('X-Requested-With', 'XMLHttpRequest');
+		$page = new Page();
+		$ctrl = new Page_Controller($page);
+		$ctrl->pushCurrent();
+		$ctrl->setRequest($req);
+		$ctrl->setDataModel(DataModel::inst());
+		$ctrl->setURLParams(array());
+		$ctrl->init();
+		$response = $ctrl->getAjaxResponse();
+		$ctrl->popCurrent();
+		$data = json_decode($response->getBody(), true);
+		$this->assertNotEmpty($data['SideCart']);
+		$this->assertNotEmpty($data['OrderHistory']);
+	}
+
+
 	// TODO: http errors
 	// TODO: html/xml output
 

@@ -438,7 +438,7 @@ class ShoppingCart_Controller extends Controller{
 		}
 
 		if ($request->isAjax()) {
-			$response = new AjaxHTTPResponse();
+			$response = $this->getAjaxResponse();
 			$this->extend('updateAddResponse', $response, $request, $success);
 			return $response;
 		} else {
@@ -457,7 +457,7 @@ class ShoppingCart_Controller extends Controller{
 		}
 
 		if ($request->isAjax()) {
-			$response = new AjaxHTTPResponse();
+			$response = $this->getAjaxResponse();
 			$this->extend('updateRemoveResponse', $response, $request, $success);
 			return $response;
 		} else {
@@ -476,7 +476,7 @@ class ShoppingCart_Controller extends Controller{
 		}
 
 		if ($request->isAjax()) {
-			$response = new AjaxHTTPResponse();
+			$response = $this->getAjaxResponse();
 			$this->extend('updateRemoveAllResponse', $response, $request, $success);
 			return $response;
 		} else {
@@ -498,7 +498,7 @@ class ShoppingCart_Controller extends Controller{
 		}
 
 		if ($request->isAjax()) {
-			$response = new AjaxHTTPResponse();
+			$response = $this->getAjaxResponse();
 			$this->extend('updateSetQuantityResponse', $response, $request, $success);
 			return $response;
 		} else {
@@ -516,7 +516,7 @@ class ShoppingCart_Controller extends Controller{
 		$this->cart->clear();
 
 		if ($request->isAjax()) {
-			$response = new AjaxHTTPResponse();
+			$response = $this->getAjaxResponse();
 			$this->extend('updateClearResponse', $response, $request, $success);
 			return $response;
 		} else {

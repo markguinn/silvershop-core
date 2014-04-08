@@ -10,7 +10,11 @@
  */
 class AjaxHTTPResponse extends SS_HTTPResponse {
 
-	const EVENTS_KEY = '__events__';
+	const EVENTS_KEY  = '__events__';
+	const REGIONS_KEY = '__regions__';
+	const PULL_HEADER = 'X-Pull-Regions';
+	const PULL_PARAM  = '__regions__';
+
 
 	/** @var array - CLIENT-SIDE events that will be triggered on the document. Key=event, value=data for event handler */
 	protected $events = array();
@@ -18,18 +22,39 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 	/** @var array - Regions to send along. Key=Template, Value=HTML */
 	protected $regions = array();
 
+	/** @var SS_HTTPRequest */
+	protected $request = null;
+
 
 	/**
 	 * Create a new HTTP response
 	 *
-	 * @param $body The body of the response
-	 * @param $statusCode The numeric status code - 200, 404, etc
-	 * @param $statusDescription The text to be given alongside the status code.
+	 * @param SS_HTTPRequest $request - The corresponding request object
+	 * @param string $body - The body of the response
+	 * @param int $statusCode - The numeric status code - 200, 404, etc
+	 * @param string $statusDescription - The text to be given alongside the status code.
 	 *  See {@link setStatusCode()} for more information.
 	 */
-	public function __construct($body = null, $statusCode = null, $statusDescription = null) {
+	public function __construct($request = null, $body = null, $statusCode = null, $statusDescription = null) {
+		if ($request && $request instanceof SS_HTTPRequest) {
+			$this->request = $request;
+		} elseif (is_string($request)) {
+			// respond intelligently if someone uses the parent constructor syntax
+			$statusDescription = $statusCode;
+			$statusCode = $body;
+			$body = $request;
+		}
+
 		parent::__construct($body, $statusCode, $statusDescription);
+
+		// default content type
 		$this->addHeader('Content-type', 'application/json');
+
+		// add the pull regions, if any
+		$pulls = $this->getPulledRegionIDs();
+		if (count($pulls) > 0) {
+			foreach ($pulls as $regionID) $this->pushRegion($regionID);
+		}
 	}
 
 
@@ -61,7 +86,9 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 		if (!empty($template)) {
 			$regionID = is_array($template) ? $template[0] : $template;
 			if (!$renderObj) $renderObj = Controller::curr();
-			$this->regions[$regionID] = $renderObj->renderWith($template, $data)->forTemplate();
+			if (!isset($this->regions[$regionID])) {
+				$this->regions[$regionID] = $renderObj->renderWith($template, $data)->forTemplate();
+			}
 		}
 
 		return $this;
@@ -89,6 +116,20 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 		}
 
 		return parent::getBody();
+	}
+
+
+	/**
+	 * Looks first for the X-Pull-Regions header and then for a __regions__ get/post var.
+	 * @return array
+	 */
+	protected function getPulledRegionIDs() {
+		if (!$this->request) return array();
+		$header = $this->request->getHeader(self::PULL_HEADER);
+		if (!empty($header)) return explode(',', $header);
+		$param  = $this->request->requestVar(self::PULL_PARAM);
+		if (!empty($param)) return explode(',', $param);
+		return array();
 	}
 
 }

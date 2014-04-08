@@ -11,12 +11,24 @@
  */
 class AjaxControllerExtension extends Extension {
 
+	protected $ajaxResponse;
+
 	/**
 	 * @param int            $errorCode
 	 * @param SS_HTTPRequest $request
 	 */
 	public function onBeforeHTTPError($errorCode, SS_HTTPRequest $request) {
-		// TODO: throw new SS_HTTPResponse_Exception($errorMessage, $errorCode);
+		// TODO: This should probably prevent the error page from generating in ajax and possibly return a json response
+		// throw new SS_HTTPResponse_Exception($errorMessage, $errorCode);
+	}
+
+
+	/**
+	 * @return AjaxHTTPResponse
+	 */
+	public function getAjaxResponse() {
+		if (!isset($this->ajaxResponse)) $this->ajaxResponse = new AjaxHTTPResponse($this->owner->getRequest());
+		return $this->ajaxResponse;
 	}
 
 }
