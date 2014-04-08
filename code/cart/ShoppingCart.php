@@ -437,8 +437,10 @@ class ShoppingCart_Controller extends Controller{
 			$this->cart->add($product, $quantity, $request->getVars());
 		}
 
-		if ($request->isAjax()) {
+		if ($request->isAjax() && $this->hasMethod('getAjaxResponse')) {
 			$response = $this->getAjaxResponse();
+			$response->addRenderTarget('BUYABLE', $product);
+			$response->addRenderTarget('CART', $this->Cart());
 			$this->extend('updateAddResponse', $response, $request, $success);
 			return $response;
 		} else {
@@ -456,8 +458,10 @@ class ShoppingCart_Controller extends Controller{
 			$this->cart->remove($product, $quantity = 1, $request->getVars());
 		}
 
-		if ($request->isAjax()) {
+		if ($request->isAjax() && $this->hasMethod('getAjaxResponse')) {
 			$response = $this->getAjaxResponse();
+			$response->addRenderTarget('BUYABLE', $product);
+			$response->addRenderTarget('CART', $this->Cart());
 			$this->extend('updateRemoveResponse', $response, $request, $success);
 			return $response;
 		} else {
@@ -475,8 +479,10 @@ class ShoppingCart_Controller extends Controller{
 			$this->cart->remove($product, null, $request->getVars());
 		}
 
-		if ($request->isAjax()) {
+		if ($request->isAjax() && $this->hasMethod('getAjaxResponse')) {
 			$response = $this->getAjaxResponse();
+			$response->addRenderTarget('BUYABLE', $product);
+			$response->addRenderTarget('CART', $this->Cart());
 			$this->extend('updateRemoveAllResponse', $response, $request, $success);
 			return $response;
 		} else {
@@ -497,8 +503,10 @@ class ShoppingCart_Controller extends Controller{
 			$this->cart->setQuantity($product, $quantity, $request->getVars());
 		}
 
-		if ($request->isAjax()) {
+		if ($request->isAjax() && $this->hasMethod('getAjaxResponse')) {
 			$response = $this->getAjaxResponse();
+			$response->addRenderTarget('BUYABLE', $product);
+			$response->addRenderTarget('CART', $this->Cart());
 			$this->extend('updateSetQuantityResponse', $response, $request, $success);
 			return $response;
 		} else {
@@ -515,8 +523,9 @@ class ShoppingCart_Controller extends Controller{
 	public function clear($request) {
 		$this->cart->clear();
 
-		if ($request->isAjax()) {
+		if ($request->isAjax() && $this->hasMethod('getAjaxResponse')) {
 			$response = $this->getAjaxResponse();
+			$response->addRenderTarget('CART', $this->Cart());
 			$this->extend('updateClearResponse', $response, $request, $success);
 			return $response;
 		} else {

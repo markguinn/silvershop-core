@@ -26,43 +26,48 @@
 		// handle ajax responses
 		$(document)
 			.ajaxComplete(function(event, xhr, ajaxOptions){
-				try {
-					var data = $.parseJSON(xhr.responseText);
-					if (data != null && typeof(data) == 'object') {
-						for (var key in data) {
-							// FIXME: this actually needs to happen after all regions are done
-							// FIXME: regions probably need their own key, just in case there are other kinds of ajax going on
-							if (key === '__events__' && typeof(data[key]) === 'object') {
-								for (var eventName in data[key]) {
-									$(document).trigger(eventName, [data[key][eventName]]);
-								}
-							} else if (typeof(data[key]) === 'string' && data[key].length > 0) {
-								var $region = $(data[key]),
-									id = $region.prop('id'),
-									classes = $region.prop('class').replace(/\s+/, ' ').replace(/^\s|\s$/, '').split(' '),
-									explicit = $('[data-ajax-region='+key+']');
+				var data = null;
 
-								if (explicit.length > 0) {
-									// If there is one (or more) element with a data-ajax-region attribute it
-									// means we know for sure it's a match to this region, usually because the
-									// watch was set up on that particular element.
-									explicit.html( $region.html() );
-								} else if (id) {
-									// second best is if the root element of the new content contains an id
-									$('#'+id).html( $region.html() );
-								} else if (classes.length > 0) {
-									// otherwise, we try to match by css classes
-									$('.'+classes.join('.')).html( $region.html() );
-								} else {
-									// finally we fail silently but leave a warning for the developer
-									if (typeof(console) != 'undefined' && typeof(console.warn) == 'function') {
-										console.warn('Region returned without class or id!');
-									}
+				try {
+					data = $.parseJSON(xhr.responseText);
+				} catch(e) {}
+
+				if (data != null && typeof(data) == 'object') {
+					for (var key in data) {
+						// FIXME: this actually needs to happen after all regions are done
+						// FIXME: regions probably need their own key, just in case there are other kinds of ajax going on
+						if (key === '__events__' && typeof(data[key]) === 'object') {
+							for (var eventName in data[key]) {
+								$(document).trigger(eventName, [data[key][eventName]]);
+							}
+						} else if (typeof(data[key]) === 'string') {
+							var $region  = $(data[key]),
+								explicit = $('[data-ajax-region=' + key + ']'),
+								id       = $region.length > 0 ? $region.prop('id') : '',
+								classes  = ($region.length > 0 && $region[0].className)
+									? $region[0].className.replace(/^\s|\s$/, '').split(/\s+/)
+									: [];
+
+							if (explicit.length > 0) {
+								// If there is one (or more) element with a data-ajax-region attribute it
+								// means we know for sure it's a match to this region, usually because the
+								// watch was set up on that particular element.
+								explicit.html( $region.html() );
+							} else if (id) {
+								// second best is if the root element of the new content contains an id
+								$('#'+id).html( $region.html() );
+							} else if (classes.length > 0) {
+								// otherwise, we try to match by css classes
+								$('.'+classes.join('.')).html( $region.html() );
+							} else {
+								// finally we fail silently but leave a warning for the developer
+								if (typeof(console) != 'undefined' && typeof(console.warn) == 'function') {
+									console.warn('Region returned without class or id!');
 								}
 							}
 						}
 					}
-				} catch(e) {}
+				}
 			})
 			.ajaxStart(function(){
 				$(document.body).addClass('ajax-loading');

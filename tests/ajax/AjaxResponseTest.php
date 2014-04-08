@@ -64,6 +64,49 @@ class AjaxResponseTest extends SapphireTest {
 	}
 
 
+	function testPullRegionByParam() {
+		// this is a dirty dirty mess. sorry.
+		$req = new SS_HTTPRequest('GET', '/test1', array(AjaxHTTPResponse::PULL_PARAM => 'SideCart,OrderHistory'));
+		$page = new Page();
+		$ctrl = new Page_Controller($page);
+		$ctrl->pushCurrent();
+		$ctrl->setRequest($req);
+		$ctrl->setDataModel(DataModel::inst());
+		$ctrl->setURLParams(array());
+		$ctrl->init();
+		$response = $ctrl->getAjaxResponse();
+		$ctrl->popCurrent();
+		$data = json_decode($response->getBody(), true);
+		$this->assertNotEmpty($data['SideCart']);
+		$this->assertNotEmpty($data['OrderHistory']);
+	}
+
+
+	function testPullRegionWithRenderTarget() {
+		// this is a dirty dirty mess. sorry.
+		$req = new SS_HTTPRequest('GET', '/test1');
+		$req->addHeader(AjaxHTTPResponse::PULL_HEADER, 'ProductGroupItem:BUYABLE');
+		$req->addHeader('X-Requested-With', 'XMLHttpRequest');
+		$page = new Page();
+		$ctrl = new Page_Controller($page);
+		$ctrl->pushCurrent();
+		$ctrl->setRequest($req);
+		$ctrl->setDataModel(DataModel::inst());
+		$ctrl->setURLParams(array());
+		$ctrl->init();
+		$response = $ctrl->getAjaxResponse();
+		$response->addRenderTarget('BUYABLE', new ArrayData(array(
+			'Title' => 'Test Product',
+			'Link'  => '/test-product',
+			'Price' => 29.99,
+		)));
+		$data = json_decode($response->getBody(), true);
+		$ctrl->popCurrent();
+		$this->assertNotEmpty($data['ProductGroupItem:BUYABLE']);
+	}
+
+
+
 	// TODO: http errors
 	// TODO: html/xml output
 

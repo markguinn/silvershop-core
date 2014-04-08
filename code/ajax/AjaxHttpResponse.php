@@ -22,6 +22,9 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 	/** @var array - Regions to send along. Key=Template, Value=HTML */
 	protected $regions = array();
 
+	/** @var array - Key/val store of objects a region can be rendered against. DEFAULT=current controller */
+	protected $renderTargets = array();
+
 	/** @var SS_HTTPRequest */
 	protected $request = null;
 
@@ -49,12 +52,7 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 
 		// default content type
 		$this->addHeader('Content-type', 'application/json');
-
-		// add the pull regions, if any
-		$pulls = $this->getPulledRegionIDs();
-		if (count($pulls) > 0) {
-			foreach ($pulls as $regionID) $this->pushRegion($regionID);
-		}
+		$this->addRenderTarget('DEFAULT', Controller::curr());
 	}
 
 
@@ -77,17 +75,23 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 
 
 	/**
-	 * @param string|array $template
+	 * @param string $template
 	 * @param ViewableData $renderObj [optional] - if not present, current controller will be used
 	 * @param array $data [optional] - if present, renderObj will be customised with this data
 	 * @return $this
 	 */
 	public function pushRegion($template, $renderObj=null, $data=null) {
 		if (!empty($template)) {
-			$regionID = is_array($template) ? $template[0] : $template;
-			if (!$renderObj) $renderObj = Controller::curr();
-			if (!isset($this->regions[$regionID])) {
-				$this->regions[$regionID] = $renderObj->renderWith($template, $data)->forTemplate();
+			// add the default render target if none is present
+			if (strpos($template, ':') === false) $template .= ':DEFAULT';
+
+			// separate the template name and render target
+			list($template, $target) = explode(':', $template);
+			if (!$renderObj) $renderObj = $this->getRenderTarget($target);
+
+			if (!isset($this->regions[$template])) {
+				// render the region
+				$this->regions[$template] = $renderObj ? $renderObj->renderWith($template, $data)->forTemplate() : '';
 			}
 		}
 
@@ -108,6 +112,12 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 				$data->$key = $this->events;
 			}
 
+			// add the pull regions, if any
+			$pulls = $this->getPulledRegionIDs();
+			if (count($pulls) > 0) {
+				foreach ($pulls as $regionID) $this->pushRegion($regionID);
+			}
+
 			if (!empty($this->regions)) {
 				foreach ($this->regions as $key => $val) $data->$key = $val;
 			}
@@ -116,6 +126,35 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 		}
 
 		return parent::getBody();
+	}
+
+
+	/**
+	 * @param string $name
+	 * @param ViewableData $obj
+	 * @return $this
+	 */
+	public function addRenderTarget($name, ViewableData $obj) {
+		$this->renderTargets[$name] = $obj;
+		return $this;
+	}
+
+
+	/**
+	 * @return $this
+	 */
+	public function clearRenderTargets() {
+		$this->renderTargets = array();
+		return $this;
+	}
+
+
+	/**
+	 * @param string $name
+	 * @return ViewableData|null
+	 */
+	public function getRenderTarget($name) {
+		return isset($this->renderTargets[$name]) ? $this->renderTargets[$name] : null;
 	}
 
 
