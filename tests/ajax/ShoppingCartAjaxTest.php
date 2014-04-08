@@ -58,7 +58,7 @@ class ShoppingCartAjaxTest extends FunctionalTest {
 		$this->assertEquals(200, $r->getStatusCode());
 		$data = json_decode($r->getBody(), true);
 		$this->assertNotEmpty($data[AjaxHTTPResponse::EVENTS_KEY]);
-		$this->assertNotEmpty($data['SideCart']);
+		$this->assertNotEmpty($data[AjaxHTTPResponse::REGIONS_KEY]['SideCart']);
 
 		$r = $this->get(ShoppingCart_Controller::add_item_link($this->socks), null, $this->ajaxHeaders);
 		$this->assertTrue($r instanceof AjaxHTTPResponse);

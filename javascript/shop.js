@@ -8,6 +8,9 @@
  */
 (function ($, window, document, undefined) {
 
+	var EVENTS_KEY  = 'events',
+		REGIONS_KEY = 'regions';
+
 	$(document).ready(function(){
 		// handle automatic ajax links
 		$(document).on('click', 'a.ajax, a[data-target=ajax]', function(){
@@ -33,38 +36,42 @@
 				} catch(e) {}
 
 				if (data != null && typeof(data) == 'object') {
-					for (var key in data) {
-						// FIXME: this actually needs to happen after all regions are done
-						// FIXME: regions probably need their own key, just in case there are other kinds of ajax going on
-						if (key === '__events__' && typeof(data[key]) === 'object') {
-							for (var eventName in data[key]) {
-								$(document).trigger(eventName, [data[key][eventName]]);
-							}
-						} else if (typeof(data[key]) === 'string') {
-							var $region  = $(data[key]),
-								explicit = $('[data-ajax-region=' + key + ']'),
-								id       = $region.length > 0 ? $region.prop('id') : '',
-								classes  = ($region.length > 0 && $region[0].className)
-									? $region[0].className.replace(/^\s|\s$/, '').split(/\s+/)
-									: [];
+					// Replace regions
+					if (typeof(data[REGIONS_KEY]) === 'object') {
+						for (var key in data[REGIONS_KEY]) {
+							if (typeof(data[REGIONS_KEY][key]) === 'string') {
+								var $region  = $(data[REGIONS_KEY][key]),
+									explicit = $('[data-ajax-region=' + key + ']'),
+									id       = $region.length > 0 ? $region.prop('id') : '',
+									classes  = ($region.length > 0 && $region[0].className)
+										? $region[0].className.replace(/^\s|\s$/, '').split(/\s+/)
+										: [];
 
-							if (explicit.length > 0) {
-								// If there is one (or more) element with a data-ajax-region attribute it
-								// means we know for sure it's a match to this region, usually because the
-								// watch was set up on that particular element.
-								explicit.html( $region.html() );
-							} else if (id) {
-								// second best is if the root element of the new content contains an id
-								$('#'+id).html( $region.html() );
-							} else if (classes.length > 0) {
-								// otherwise, we try to match by css classes
-								$('.'+classes.join('.')).html( $region.html() );
-							} else {
-								// finally we fail silently but leave a warning for the developer
-								if (typeof(console) != 'undefined' && typeof(console.warn) == 'function') {
-									console.warn('Region returned without class or id!');
+								if (explicit.length > 0) {
+									// If there is one (or more) element with a data-ajax-region attribute it
+									// means we know for sure it's a match to this region, usually because the
+									// watch was set up on that particular element.
+									explicit.html( $region.html() );
+								} else if (id) {
+									// second best is if the root element of the new content contains an id
+									$('#'+id).html( $region.html() );
+								} else if (classes.length > 0) {
+									// otherwise, we try to match by css classes
+									$('.'+classes.join('.')).html( $region.html() );
+								} else {
+									// finally we fail silently but leave a warning for the developer
+									if (typeof(console) != 'undefined' && typeof(console.warn) == 'function') {
+										console.warn('Region returned without class or id!');
+									}
 								}
 							}
+						}
+					}
+
+					// Trigger events
+					if (typeof(data[EVENTS_KEY]) === 'object') {
+						for (var eventName in data[EVENTS_KEY]) {
+							$(document).trigger(eventName, [data[EVENTS_KEY][eventName]]);
 						}
 					}
 				}

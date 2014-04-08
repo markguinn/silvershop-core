@@ -39,8 +39,8 @@ class AjaxResponseTest extends SapphireTest {
 		$r->pushRegion('SideCart', $mock);
 		$json = $r->getBody();
 		$data = json_decode($json, true);
-		$this->assertNotEmpty($data['SideCart'], 'should contain an entry for the side cart');
-		$this->assertEquals($data['SideCart'], $mock->renderWith('SideCart')->forTemplate(), 'SideCart entry should match the sidecart template');
+		$this->assertNotEmpty($data[AjaxHTTPResponse::REGIONS_KEY]['SideCart'], 'should contain an entry for the side cart');
+		$this->assertEquals($data[AjaxHTTPResponse::REGIONS_KEY]['SideCart'], $mock->renderWith('SideCart')->forTemplate(), 'SideCart entry should match the sidecart template');
 	}
 
 
@@ -59,8 +59,8 @@ class AjaxResponseTest extends SapphireTest {
 		$response = $ctrl->getAjaxResponse();
 		$ctrl->popCurrent();
 		$data = json_decode($response->getBody(), true);
-		$this->assertNotEmpty($data['SideCart']);
-		$this->assertNotEmpty($data['OrderHistory']);
+		$this->assertNotEmpty($data[AjaxHTTPResponse::REGIONS_KEY]['SideCart']);
+		$this->assertNotEmpty($data[AjaxHTTPResponse::REGIONS_KEY]['OrderHistory']);
 	}
 
 
@@ -77,8 +77,8 @@ class AjaxResponseTest extends SapphireTest {
 		$response = $ctrl->getAjaxResponse();
 		$ctrl->popCurrent();
 		$data = json_decode($response->getBody(), true);
-		$this->assertNotEmpty($data['SideCart']);
-		$this->assertNotEmpty($data['OrderHistory']);
+		$this->assertNotEmpty($data[AjaxHTTPResponse::REGIONS_KEY]['SideCart']);
+		$this->assertNotEmpty($data[AjaxHTTPResponse::REGIONS_KEY]['OrderHistory']);
 	}
 
 
@@ -102,7 +102,7 @@ class AjaxResponseTest extends SapphireTest {
 		)));
 		$data = json_decode($response->getBody(), true);
 		$ctrl->popCurrent();
-		$this->assertNotEmpty($data['ProductGroupItem:BUYABLE']);
+		$this->assertNotEmpty($data[AjaxHTTPResponse::REGIONS_KEY]['ProductGroupItem']);
 	}
 
 

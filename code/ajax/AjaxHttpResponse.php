@@ -10,10 +10,10 @@
  */
 class AjaxHTTPResponse extends SS_HTTPResponse {
 
-	const EVENTS_KEY  = '__events__';
-	const REGIONS_KEY = '__regions__';
-	const PULL_HEADER = 'X-Pull-Regions';
+	const EVENTS_KEY  = 'events';
+	const REGIONS_KEY = 'regions';
 	const PULL_PARAM  = '__regions__';
+	const PULL_HEADER = 'X-Pull-Regions';
 
 
 	/** @var array - CLIENT-SIDE events that will be triggered on the document. Key=event, value=data for event handler */
@@ -119,7 +119,8 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 			}
 
 			if (!empty($this->regions)) {
-				foreach ($this->regions as $key => $val) $data->$key = $val;
+				$key = self::REGIONS_KEY;
+				$data->$key = $this->regions;
 			}
 
 			$this->setBody(json_encode($data));
