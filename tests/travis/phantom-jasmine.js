@@ -34,7 +34,7 @@ try {
 	// otherwise, assume PhantomJS 1.4
 	args = phantom.args;
 	lengthOkay = (args.length === 1);
-	appName = 'phantom-qunit.js'
+	appName = 'phantom-jasmine.js'
 	url = args[0];
 }
 
@@ -113,6 +113,7 @@ page.onConsoleMessage = function(message) {
 }
 
 page.open(url, function(success) {
+	page.render('tests.png');
 	if (success === "success") {
 		if (!attachedDoneCallback) {
 			printError("Phantom callbacks not attached in time.  See http://github.com/mark-rushakoff/OpenPhantomScripts/issues/1");

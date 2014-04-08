@@ -151,9 +151,12 @@
 				request = mostRecentAjaxRequest();
 				expect(request.requestHeaders['X-Pull-Regions']).toBeUndefined();
 
-				$.ajax({url:'http://' + document.location.host + '/cart'});
-				request = mostRecentAjaxRequest();
-				expect(request.requestHeaders['X-Pull-Regions']).toBe('SideCart');
+				// this isn't present on phantomjs (travis)
+				if (document.location.host) {
+					$.ajax({url:'http://' + document.location.host + '/cart'});
+					request = mostRecentAjaxRequest();
+					expect(request.requestHeaders['X-Pull-Regions']).toBe('SideCart');
+				}
 
 				$.ajax({url:'/test1/'});
 				request = mostRecentAjaxRequest();
