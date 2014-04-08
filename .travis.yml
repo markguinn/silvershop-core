@@ -21,6 +21,7 @@ before_script:
   - cd ~/builds/ss
 
 script:
+  - phantomjs shop/tests/travis/phantom-jasmine.js shop/tests/ajax/ShopAjaxTest.html
   - "if [ \"$COVERAGE\" = \"\" ]; then phpunit -c shop/phpunit.xml.dist; fi"
   - "if [ \"$COVERAGE\" = \"1\" ]; then phpunit -c shop/phpunit.xml.dist --coverage-clover shop/coverage.xml; fi"
 
