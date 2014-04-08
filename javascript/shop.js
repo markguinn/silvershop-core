@@ -1,24 +1,36 @@
 /**
  * Overall javascript framework for shop module.
  *
+ * NOTE: the funny syntax below allows the module to
+ * be loaded with or without RequireJS/AMD.
+ * See: https://github.com/umdjs/umd/blob/master/jqueryPlugin.js
+ *
  * @author Mark Guinn <mark@adaircreative.com>
  * @date 04.03.2014
  * @package shop
  * @subpackage javascript
  */
-(function ($, window, document, undefined) {
+(function (root, factory) {
+	if (typeof define === 'function' && define.amd) {
+		// AMD. Register as an anonymous module.
+		define(['jquery'], factory);
+	} else {
+		// Browser globals
+		factory(root.jQuery);
+	}
+}(this, function ($) {
 
-	var EVENTS_KEY  = 'events',
+	var EVENTS_KEY = 'events',
 		REGIONS_KEY = 'regions';
 
-	$(document).ready(function(){
+	$(document).ready(function () {
 		// handle automatic ajax links
-		$(document).on('click', 'a.ajax, a[data-target=ajax]', function(){
+		$(document).on('click', 'a.ajax, a[data-target=ajax]', function () {
 			var $link = $(this).addClass('ajax-loading');
 
 			$.ajax({
 				url: this.href,
-				complete: function(){
+				complete: function () {
 					$link.removeClass('ajax-loading');
 				}
 			});
@@ -28,22 +40,23 @@
 
 		// handle ajax responses
 		$(document)
-			.ajaxComplete(function(event, xhr, ajaxOptions){
+			.ajaxComplete(function (event, xhr, ajaxOptions) {
 				var data = null;
 
 				try {
 					data = $.parseJSON(xhr.responseText);
-				} catch(e) {}
+				} catch (e) {
+				}
 
 				if (data != null && typeof(data) == 'object') {
 					// Replace regions
 					if (typeof(data[REGIONS_KEY]) === 'object') {
 						for (var key in data[REGIONS_KEY]) {
 							if (typeof(data[REGIONS_KEY][key]) === 'string') {
-								var $region  = $(data[REGIONS_KEY][key]),
+								var $region = $(data[REGIONS_KEY][key]),
 									explicit = $('[data-ajax-region=' + key + ']'),
-									id       = $region.length > 0 ? $region.prop('id') : '',
-									classes  = ($region.length > 0 && $region[0].className)
+									id = $region.length > 0 ? $region.prop('id') : '',
+									classes = ($region.length > 0 && $region[0].className)
 										? $region[0].className.replace(/^\s|\s$/, '').split(/\s+/)
 										: [];
 
@@ -51,13 +64,13 @@
 									// If there is one (or more) element with a data-ajax-region attribute it
 									// means we know for sure it's a match to this region, usually because the
 									// watch was set up on that particular element.
-									explicit.html( $region.html() );
+									explicit.html($region.html());
 								} else if (id) {
 									// second best is if the root element of the new content contains an id
-									$('#'+id).html( $region.html() );
+									$('#' + id).html($region.html());
 								} else if (classes.length > 0) {
 									// otherwise, we try to match by css classes
-									$('.'+classes.join('.')).html( $region.html() );
+									$('.' + classes.join('.')).html($region.html());
 								} else {
 									// finally we fail silently but leave a warning for the developer
 									if (typeof(console) != 'undefined' && typeof(console.warn) == 'function') {
@@ -76,10 +89,10 @@
 					}
 				}
 			})
-			.ajaxStart(function(){
+			.ajaxStart(function () {
 				$(document.body).addClass('ajax-loading');
 			})
-			.ajaxStop(function(){
+			.ajaxStop(function () {
 				$(document.body).addClass('ajax-loading');
 			})
 		;
@@ -93,7 +106,7 @@
 		 * @param {string} url
 		 * @returns {string}
 		 */
-		var normaliseURL = function(url) {
+		var normaliseURL = function (url) {
 			return $('<a></a>').prop('href', url).prop('search', '').prop('hash', '').prop('href').replace('?#', '');
 		};
 
@@ -104,7 +117,7 @@
 		 * @param {string} region
 		 * @param {jQuery} target
 		 */
-		var addWatch = function(url, region, target) {
+		var addWatch = function (url, region, target) {
 			url = normaliseURL(url);
 			if (typeof(pullWatches[url]) == 'undefined') pullWatches[url] = [];
 			pullWatches[url].push(region);
@@ -122,7 +135,7 @@
 		 * @param {string} pattern
 		 * @returns {boolean}
 		 */
-		var doesUrlMatch = function(url, pattern) {
+		var doesUrlMatch = function (url, pattern) {
 			if (pattern.indexOf('*') > -1) {
 				var re = new RegExp(pattern.replace('.', '\\.').replace('*', '.*'));
 				return re.test(url);
@@ -138,7 +151,7 @@
 		 * @param {string} region [optional]
 		 * @returns {*}
 		 */
-		$.fn.pullRegionForURL = function(urls, region) {
+		$.fn.pullRegionForURL = function (urls, region) {
 			// this is a more user friendly interface if you only have one url to watch
 			if (typeof(urls) == 'string') {
 				addWatch(urls, region, this);
@@ -160,13 +173,13 @@
 		/**
 		 * Clear all ajax request watches
 		 */
-		$.fn.clearPullRegions = function() {
+		$.fn.clearPullRegions = function () {
 			pullWatches = {};
 			return this;
 		};
 
 		// Watch the outgoing requests and add headers as needed
-		$.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+		$.ajaxPrefilter(function (options, originalOptions, jqXHR) {
 			var regions = [],
 				checkUrl = normaliseURL(options.url);
 
@@ -186,10 +199,10 @@
 	});
 
 	// Automatically set up pulls by data-ajax-watch
-	$(window).on('load', function(){
-		$('[data-ajax-watch]').each(function(index, el) {
+	$(window).on('load', function () {
+		$('[data-ajax-watch]').each(function (index, el) {
 			$(el).pullRegionForURL(el.getAttribute('data-ajax-watch'), el.getAttribute('data-ajax-region'));
 		});
 	});
 
-}(jQuery, this, this.document));
+}));
