@@ -437,15 +437,8 @@ class ShoppingCart_Controller extends Controller{
 			$this->cart->add($product, $quantity, $request->getVars());
 		}
 
-		if ($request->isAjax() && $this->hasMethod('getAjaxResponse')) {
-			$response = $this->getAjaxResponse();
-			$response->addRenderTarget('BUYABLE', $product);
-			$response->addRenderTarget('CART', $this->Cart());
-			$this->extend('updateAddResponse', $response, $request, $success);
-			return $response;
-		} else {
-			return self::direct();
-		}
+		$this->extend('updateAddResponse', $request, $response, $product);
+		return $response ? $response : self::direct();
 	}
 
 	/**
@@ -458,15 +451,8 @@ class ShoppingCart_Controller extends Controller{
 			$this->cart->remove($product, $quantity = 1, $request->getVars());
 		}
 
-		if ($request->isAjax() && $this->hasMethod('getAjaxResponse')) {
-			$response = $this->getAjaxResponse();
-			$response->addRenderTarget('BUYABLE', $product);
-			$response->addRenderTarget('CART', $this->Cart());
-			$this->extend('updateRemoveResponse', $response, $request, $success);
-			return $response;
-		} else {
-			return self::direct();
-		}
+		$this->extend('updateRemoveResponse', $request, $response, $product);
+		return $response ? $response : self::direct();
 	}
 
 	/**
@@ -479,15 +465,8 @@ class ShoppingCart_Controller extends Controller{
 			$this->cart->remove($product, null, $request->getVars());
 		}
 
-		if ($request->isAjax() && $this->hasMethod('getAjaxResponse')) {
-			$response = $this->getAjaxResponse();
-			$response->addRenderTarget('BUYABLE', $product);
-			$response->addRenderTarget('CART', $this->Cart());
-			$this->extend('updateRemoveAllResponse', $response, $request, $success);
-			return $response;
-		} else {
-			return self::direct();
-		}
+		$this->extend('updateRemoveAllResponse', $request, $response, $product);
+		return $response ? $response : self::direct();
 	}
 
 
@@ -503,15 +482,8 @@ class ShoppingCart_Controller extends Controller{
 			$this->cart->setQuantity($product, $quantity, $request->getVars());
 		}
 
-		if ($request->isAjax() && $this->hasMethod('getAjaxResponse')) {
-			$response = $this->getAjaxResponse();
-			$response->addRenderTarget('BUYABLE', $product);
-			$response->addRenderTarget('CART', $this->Cart());
-			$this->extend('updateSetQuantityResponse', $response, $request, $success);
-			return $response;
-		} else {
-			return self::direct();
-		}
+		$this->extend('updateSetQuantityResponse', $request, $response, $product);
+		return $response ? $response : self::direct();
 	}
 
 
@@ -522,15 +494,8 @@ class ShoppingCart_Controller extends Controller{
 	 */
 	public function clear($request) {
 		$this->cart->clear();
-
-		if ($request->isAjax() && $this->hasMethod('getAjaxResponse')) {
-			$response = $this->getAjaxResponse();
-			$response->addRenderTarget('CART', $this->Cart());
-			$this->extend('updateClearResponse', $response, $request, $success);
-			return $response;
-		} else {
-			return self::direct();
-		}
+		$this->extend('updateClearResponse', $request, $response);
+		return $response ? $response : self::direct();
 	}
 
 	/**

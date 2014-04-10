@@ -23,7 +23,7 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 	protected $regions = array();
 
 	/** @var array - Key/val store of objects a region can be rendered against. DEFAULT=current controller */
-	protected $renderTargets = array();
+	protected $renderContexts = array();
 
 	/** @var SS_HTTPRequest */
 	protected $request = null;
@@ -52,7 +52,7 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 
 		// default content type
 		$this->addHeader('Content-type', 'application/json');
-		$this->addRenderTarget('DEFAULT', Controller::curr());
+		$this->addRenderContext('DEFAULT', Controller::curr());
 	}
 
 
@@ -76,22 +76,22 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 
 	/**
 	 * @param string $template
-	 * @param ViewableData $renderObj [optional] - if not present, current controller will be used
+	 * @param ViewableData $contextObj [optional] - if not present, current controller will be used
 	 * @param array $data [optional] - if present, renderObj will be customised with this data
 	 * @return $this
 	 */
-	public function pushRegion($template, $renderObj=null, $data=null) {
+	public function pushRegion($template, $contextObj=null, $data=null) {
 		if (!empty($template)) {
 			// add the default render target if none is present
 			if (strpos($template, ':') === false) $template .= ':DEFAULT';
 
 			// separate the template name and render target
-			list($template, $target) = explode(':', $template);
-			if (!$renderObj) $renderObj = $this->getRenderTarget($target);
+			list($template, $contextName) = explode(':', $template);
+			if (!$contextObj) $contextObj = $this->getRenderContext($contextName);
 
 			if (!isset($this->regions[$template])) {
 				// render the region
-				$this->regions[$template] = $renderObj ? $renderObj->renderWith($template, $data)->forTemplate() : '';
+				$this->regions[$template] = $contextObj ? $contextObj->renderWith($template, $data)->forTemplate() : '';
 			}
 		}
 
@@ -135,8 +135,8 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 	 * @param ViewableData $obj
 	 * @return $this
 	 */
-	public function addRenderTarget($name, ViewableData $obj) {
-		$this->renderTargets[$name] = $obj;
+	public function addRenderContext($name, ViewableData $obj) {
+		$this->renderContexts[$name] = $obj;
 		return $this;
 	}
 
@@ -144,8 +144,8 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 	/**
 	 * @return $this
 	 */
-	public function clearRenderTargets() {
-		$this->renderTargets = array();
+	public function clearRenderContexts() {
+		$this->renderContexts = array();
 		return $this;
 	}
 
@@ -154,8 +154,8 @@ class AjaxHTTPResponse extends SS_HTTPResponse {
 	 * @param string $name
 	 * @return ViewableData|null
 	 */
-	public function getRenderTarget($name) {
-		return isset($this->renderTargets[$name]) ? $this->renderTargets[$name] : null;
+	public function getRenderContext($name) {
+		return isset($this->renderContexts[$name]) ? $this->renderContexts[$name] : null;
 	}
 
 

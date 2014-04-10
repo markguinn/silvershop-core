@@ -14,6 +14,7 @@ Shop has some built-in ajax functionality. It has the following goals/requiremen
   * trigger jquery events on the document (or some other pub/sub system)
 
 
+
 ## Client Side
 
 ### Link Behaviours:
@@ -54,6 +55,29 @@ detect this region in the response and replace it. The following criteria are us
    same classes.
 4. If all of the above come up short, it will fail silently.
 
+#### Render Context for Regions
+Finally, in some cases you may want the region to render in a different context than the current controller/page. An
+example of this would be if you have a grid of products and you want to update only the product that was added to the
+cart.
+
+On the server, the controller can define zero or more additional rendering contexts by name. For example, the add
+to cart action uses the following:
+
+```php
+$response->addRenderContext('PRODUCT', $product);   // this is the product we just added to the cart
+$response->addRenderContext('CART', $this->Cart()); // this is the shopping cart object
+```
+
+On the client, we can then request a region by both the template name and the desired context. For exmaple:
+
+```js
+$(document).pullRegionForURL({
+	'/shoppingcart/*':    'ProductGroupItem:PRODUCT'
+});
+```
+
+Which will cause the added product to be updated if it's being displayed in a grid, provided the root element has
+a CSS id that's unique to the product (something like `ProductGridItem_$ID`).
 
 
 ## Server Side
@@ -81,21 +105,18 @@ Within shop module the above is extracted into an extension. For example:
 class ShoppingCart_Controller {
 	function add($request) {
 		// Do something...
-
-		if ($request->isAjax()) {
-			$response = $this->getAjaxResponse();
-			$this->extend('updateAddResponse', $response, $request, $success);
-			return $response;
-		} else {
-			return $this->redirectBack(); // or render or whatever
-		}
+		$this->extend('updateAddResponse', $request, $response, $product);
+		return $response ? $response : self::direct();
 	}
 }
 
 class ShoppingCartAjax extends Extension {
-	function updateAddResponse($response, $request) {
-		$response->triggerEvent('cartchange');
-		$response->pushRegion('SideCart');
+	public function updateAddResponse(&$request, &$response, $product=null) {
+		if ($request->isAjax()) {
+			if (!$response) $response = $this->owner->getAjaxResponse();
+			$response->pushRegion('SideCart', $this->owner);
+			$response->triggerEvent('cartadd');
+		}
 	}
 }
 ```

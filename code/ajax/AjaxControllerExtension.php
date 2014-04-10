@@ -27,7 +27,7 @@ class AjaxControllerExtension extends Extension {
 	 * @return AjaxHTTPResponse
 	 */
 	public function getAjaxResponse() {
-		if (!isset($this->ajaxResponse)) $this->ajaxResponse = new AjaxHTTPResponse($this->owner->getRequest());
+		if (!isset($this->ajaxResponse)) $this->ajaxResponse = Injector::inst()->create('AjaxHTTPResponse', $this->owner->getRequest());
 		return $this->ajaxResponse;
 	}
 
