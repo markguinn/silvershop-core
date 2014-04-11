@@ -337,6 +337,54 @@
 
 		describe('ajax errors', function(){
 
+			afterEach(function(){
+				$('.statusMessage').remove();
+			});
+
+			var checkJsonForStatus = function(status) {
+				$.ajax({url:'/'});
+				var request = mostRecentAjaxRequest();
+				spyOnEvent(document, 'event1');
+				var response = JSON.parse( JSON.stringify(TestResponses.events) );
+				response.status = status;
+				request.response(response);
+				expect('event1').toHaveBeenTriggeredOn(document);
+			};
+
+			it('should function exactly the same if a json payload is present (400)', function(){ checkJsonForStatus(400); });
+			it('should function exactly the same if a json payload is present (404)', function(){ checkJsonForStatus(404); });
+			it('should function exactly the same if a json payload is present (409)', function(){ checkJsonForStatus(409); });
+			it('should function exactly the same if a json payload is present (422)', function(){ checkJsonForStatus(422); });
+			it('should function exactly the same if a json payload is present (500)', function(){ checkJsonForStatus(500); });
+
+			it('should display the response body if it is a simple string', function(){
+				$.ajax({url:'/'});
+				var request = mostRecentAjaxRequest();
+				request.response(TestResponses.errorStringResponse);
+				expect($('.statusMessage.error')).toHaveHtml('Test Error Message');
+			});
+
+			it('should display the response body if it is html and does not appear to be a full html page', function(){
+				$.ajax({url:'/'});
+				var request = mostRecentAjaxRequest();
+				request.response(TestResponses.errorHtmlResponse);
+				expect($('.statusMessage.error')).toHaveHtml('<p>Test <strong>Error</strong> Message</p>');
+			});
+
+			it('should not display the response body if it appears to be a full page', function(){
+				$.ajax({url:'/'});
+				var request = mostRecentAjaxRequest();
+				request.response(TestResponses.errorHtmlResponse);
+				expect($('.statusMessage.error').html()).not.toMatch(/Test Error Message/);
+			});
+
+			it('should display an intelligent error message if no other response is given', function(){
+				$.ajax({url:'/'});
+				var request = mostRecentAjaxRequest();
+				request.response(TestResponses.errorEmpty);
+				expect($('.statusMessage.error')).toHaveHtml('Bad Request');
+			});
+
 		});
 
 	});

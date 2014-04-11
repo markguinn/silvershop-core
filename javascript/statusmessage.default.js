@@ -23,7 +23,6 @@
 	}
 
 	function showMessage(msg) {
-		console.log('show', msg);
 		if (typeof(msg) === 'string') msg = {content:msg};
 		if (typeof(msg.content) != 'string') return;
 		if (typeof(msg.type) != 'string') msg.type = '';
@@ -39,7 +38,6 @@
 	}
 
 	$(document).on('statusmessage', function(e, msg){
-		console.log('event', msg);
 		if ($.isArray(msg)) {
 			for (var i = 0; i < msg.length; i++) showMessage(msg[i]);
 		} else {

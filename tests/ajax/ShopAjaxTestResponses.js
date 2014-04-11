@@ -62,4 +62,24 @@ var TestResponses = {
 			}
 		})
 	},
+
+	errorEmpty: {
+		status: 400,
+		responseText: ''
+	},
+
+	errorStringResponse: {
+		status: 400,
+		responseText: 'Test Error Message'
+	},
+
+	errorHtmlResponse: {
+		status: 400,
+		responseText: '<p>Test <strong>Error</strong> Message</p>'
+	},
+
+	errorPageResponse: {
+		status: 400,
+		responseText: '<html><body>Test Error Message</body></html>'
+	}
 };
