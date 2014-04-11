@@ -44,7 +44,10 @@ class VariationForm extends AddProductForm{
 		}else{
 			$form->sessionMessage("That variation is not available, sorry.","bad"); //validation fail
 		}
-		ShoppingCart_Controller::direct();
+
+		$request = $this->getRequest();
+		$this->extend('updateVariationFormResponse', $request, $response, $variation, $quantity, $form);
+		return $response ? $response : ShoppingCart_Controller::direct();
 	}
 
 	public function getBuyable($data = null){

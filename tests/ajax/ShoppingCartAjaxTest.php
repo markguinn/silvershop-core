@@ -19,6 +19,7 @@ class ShoppingCartAjaxTest extends FunctionalTest {
 
 	public function setUpOnce() {
 		if (!ShoppingCart_Controller::has_extension('ShoppingCartAjax')) ShoppingCart_Controller::add_extension('ShoppingCartAjax');
+		if (!VariationForm::has_extension('ShoppingCartAjax')) VariationForm::add_extension('ShoppingCartAjax');
 		if (!Controller::has_extension('AjaxControllerExtension')) Controller::add_extension('AjaxControllerExtension');
 		parent::setUpOnce();
 	}
@@ -144,7 +145,29 @@ class ShoppingCartAjaxTest extends FunctionalTest {
 	}
 
 
-	// TODO: test VariationForm and AddProductForm
+//	public function testVariationForm() {
+//		$this->loadFixture('shop/tests/fixtures/variations.yml');
+//		$ballRoot = $this->objFromFixture('Product', 'ball');
+//		$ballRoot->publish('Stage','Live');
+//		$ball1 = $this->objFromFixture('ProductVariation', 'redlarge');
+//		$ball2 = $this->objFromFixture('ProductVariation', 'redsmall');
+//
+//		$url = $ballRoot->Link() . 'Form';
+//		echo "url=$url\n";
+//		$r = $this->post($url, array(
+//			'ProductAttributes[1]'  => 3,   // size: large
+//			'ProductAttributes[2]'  => 4,   // color: red
+//			'Quantity'              => 1,
+//			'action_addtocart'      => 'Add to Cart',
+//		), $this->ajaxHeaders);
+//
+//		Debug::dump($r);
+//		$this->assertTrue($r instanceof AjaxHTTPResponse);
+//		$items = ShoppingCart::curr()->Items();
+//		$this->assertNotNull($items);
+//		$this->assertEquals($items->Count(), 1,          'There is 1 item in the cart');
+//		$this->assertTrue($this->cart->get($ball1) instanceof ProductVariation_OrderItem, "first item is correct");
+//	}
 
 
 }

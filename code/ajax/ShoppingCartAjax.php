@@ -13,8 +13,9 @@ class ShoppingCartAjax extends Extension {
 	 * @param SS_HTTPRequest $request
 	 * @param AjaxHTTPResponse $response
 	 * @param Buyable $product [optional]
+	 * @param int $quantity [optional]
 	 */
-	public function updateAddResponse(&$request, &$response, $product=null) {
+	public function updateAddResponse(&$request, &$response, $product=null, $quantity=1) {
 		if ($request->isAjax()) {
 			if (!$response) $response = $this->owner->getAjaxResponse();
 			$this->setupRenderContexts($response, $product);
@@ -22,8 +23,8 @@ class ShoppingCartAjax extends Extension {
 			$response->triggerEvent('cartadd');
 			$response->triggerEvent('cartchange', array(
 				'action'    => 'add',
-				'id'        => $request->param('ID'),
-				'quantity'  => $request->requestVar('quantity'),
+				'id'        => $product->ID,
+				'quantity'  => $quantity,
 			));
 		}
 	}
@@ -33,8 +34,9 @@ class ShoppingCartAjax extends Extension {
 	 * @param SS_HTTPRequest $request
 	 * @param AjaxHTTPResponse $response
 	 * @param Buyable $product [optional]
+	 * @param int $quantity [optional]
 	 */
-	public function updateRemoveResponse(&$request, &$response, $product=null) {
+	public function updateRemoveResponse(&$request, &$response, $product=null, $quantity=1) {
 		if ($request->isAjax()) {
 			if (!$response) $response = $this->owner->getAjaxResponse();
 			$this->setupRenderContexts($response, $product);
@@ -42,8 +44,8 @@ class ShoppingCartAjax extends Extension {
 			$response->triggerEvent('cartremove');
 			$response->triggerEvent('cartchange', array(
 				'action'    => 'remove',
-				'id'        => $request->param('ID'),
-				'quantity'  => $request->requestVar('quantity'),
+				'id'        => $product->ID,
+				'quantity'  => $quantity,
 			));
 		}
 	}
@@ -62,7 +64,7 @@ class ShoppingCartAjax extends Extension {
 			$response->triggerEvent('cartremove');
 			$response->triggerEvent('cartchange', array(
 				'action'    => 'removeall',
-				'id'        => $request->param('ID'),
+				'id'        => $product,
 				'quantity'  => 0,
 			));
 		}
@@ -73,8 +75,9 @@ class ShoppingCartAjax extends Extension {
 	 * @param SS_HTTPRequest $request
 	 * @param AjaxHTTPResponse $response
 	 * @param Buyable $product [optional]
+	 * @param int $quantity [optional]
 	 */
-	public function updateSetQuantityResponse(&$request, &$response, $product=null) {
+	public function updateSetQuantityResponse(&$request, &$response, $product=null, $quantity=1) {
 		if ($request->isAjax()) {
 			if (!$response) $response = $this->owner->getAjaxResponse();
 			$this->setupRenderContexts($response, $product);
@@ -82,8 +85,8 @@ class ShoppingCartAjax extends Extension {
 			$response->triggerEvent('cartquantity');
 			$response->triggerEvent('cartchange', array(
 				'action'    => 'setquantity',
-				'id'        => $request->param('ID'),
-				'quantity'  => $request->requestVar('quantity'),
+				'id'        => $product->ID,
+				'quantity'  => $quantity,
 			));
 		}
 	}
@@ -107,13 +110,46 @@ class ShoppingCartAjax extends Extension {
 
 
 	/**
+	 * Adds the ajax class to the VariationForm
+	 */
+	public function updateVariationForm() {
+		$this->owner->addExtraClass('ajax');
+	}
+
+
+	/**
+	 * @param SS_HTTPRequest $request
+	 * @param AjaxHTTPResponse $response
+	 * @param Buyable $variation [optional]
+	 * @param int $quantity [optional]
+	 * @param VariationForm $form [optional]
+	 */
+	public function updateVariationFormResponse(&$request, &$response, $variation=null, $quantity=1, $form=null) {
+		if ($request->isAjax()) {
+			if (!$response) $response = $this->owner->getAjaxResponse();
+			$this->setupRenderContexts($response, $variation);
+			$response->addRenderContext('FORM', $form);
+			$response->pushRegion('SideCart', $this->owner);
+			$response->triggerEvent('cartadd');
+			$response->triggerEvent('cartchange', array(
+				'action'    => 'add',
+				'id'        => $variation->ID,
+				'quantity'  => $quantity,
+			));
+		}
+	}
+
+
+	/**
 	 * Adds some standard render contexts for pulled regions.
 	 *
 	 * @param AjaxHTTPResponse $response
 	 * @param Buyable $buyable [optional]
 	 */
 	protected function setupRenderContexts(AjaxHTTPResponse $response, $buyable=null) {
-		$response->addRenderContext('CART', $this->owner->Cart());
+		if ($this->owner->hasMethod('Cart')) {
+			$response->addRenderContext('CART', $this->owner->Cart());
+		}
 
 		if ($buyable) {
 			$response->addRenderContext('BUYABLE', $buyable);

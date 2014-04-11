@@ -19,12 +19,14 @@
 		factory(root.jQuery);
 	}
 }(this, function ($) {
-
 	var EVENTS_KEY = 'events',
 		REGIONS_KEY = 'regions';
 
 	$(document).ready(function () {
-		// handle automatic ajax links
+
+		// handle automatic ajax elements //////////////////////////////////////////////////////////////////////////////
+
+
 		$(document).on('click', 'a.ajax, a[data-target=ajax]', function () {
 			var $link = $(this).addClass('ajax-loading');
 
@@ -38,7 +40,32 @@
 			return false;
 		});
 
-		// handle ajax responses
+
+		$(document).on('submit', 'form.ajax, form[data-target=ajax]', function(e){
+			console.log(e);
+			var $form = $(this).addClass('ajax-loading');
+
+			$.ajax({
+				url:    $form.prop('action'),
+				type:   $form.prop('method'),
+				data:   $form.serialize(),
+			}).done(function () {
+				$form.removeClass('ajax-loading');
+				$form.find('.ajax-loading').removeClass('ajax-loading');
+			});
+
+			return false;
+		});
+
+		// we usually want to show the loading indicator on the button instead of the whole form
+		$(document).on('click', 'form.ajax input[type=submit], form[data-target=ajax] input[type=submit]', function(){
+			$(this).addClass('ajax-loading');
+		});
+
+
+		// handle ajax responses ///////////////////////////////////////////////////////////////////////////////////////
+
+
 		$(document)
 			.ajaxComplete(function (event, xhr, ajaxOptions) {
 				var data = null;
@@ -97,8 +124,11 @@
 			})
 		;
 
-		// handle ajax pulls
+
+		// handle ajax pulls ///////////////////////////////////////////////////////////////////////////////////////////
 		// TODO: This should probably be pulled out into a separate file
+
+
 		var pullWatches = {};
 
 		/**

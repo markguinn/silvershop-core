@@ -437,7 +437,7 @@ class ShoppingCart_Controller extends Controller{
 			$this->cart->add($product, $quantity, $request->getVars());
 		}
 
-		$this->extend('updateAddResponse', $request, $response, $product);
+		$this->extend('updateAddResponse', $request, $response, $product, $quantity);
 		return $response ? $response : self::direct();
 	}
 
@@ -451,7 +451,7 @@ class ShoppingCart_Controller extends Controller{
 			$this->cart->remove($product, $quantity = 1, $request->getVars());
 		}
 
-		$this->extend('updateRemoveResponse', $request, $response, $product);
+		$this->extend('updateRemoveResponse', $request, $response, $product, $quantity);
 		return $response ? $response : self::direct();
 	}
 
@@ -482,7 +482,7 @@ class ShoppingCart_Controller extends Controller{
 			$this->cart->setQuantity($product, $quantity, $request->getVars());
 		}
 
-		$this->extend('updateSetQuantityResponse', $request, $response, $product);
+		$this->extend('updateSetQuantityResponse', $request, $response, $product, $quantity);
 		return $response ? $response : self::direct();
 	}
 

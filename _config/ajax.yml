@@ -10,3 +10,5 @@ ShoppingCart_Controller:
 VariationForm:
   extensions:
     - ShoppingCartAjax
+    - AjaxControllerExtension
+    - ViewableCart

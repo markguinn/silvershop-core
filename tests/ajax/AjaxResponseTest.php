@@ -82,7 +82,7 @@ class AjaxResponseTest extends SapphireTest {
 	}
 
 
-	function testPullRegionWithRenderTarget() {
+	function testPullRegionWithRenderContext() {
 		// this is a dirty dirty mess. sorry.
 		$req = new SS_HTTPRequest('GET', '/test1');
 		$req->addHeader(AjaxHTTPResponse::PULL_HEADER, 'ProductGroupItem:BUYABLE');
@@ -95,7 +95,7 @@ class AjaxResponseTest extends SapphireTest {
 		$ctrl->setURLParams(array());
 		$ctrl->init();
 		$response = $ctrl->getAjaxResponse();
-		$response->addRenderTarget('BUYABLE', new ArrayData(array(
+		$response->addRenderContext('BUYABLE', new ArrayData(array(
 			'Title' => 'Test Product',
 			'Link'  => '/test-product',
 			'Price' => 29.99,
