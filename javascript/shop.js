@@ -24,42 +24,52 @@
 
 	$(document).ready(function () {
 
+
 		// handle automatic ajax elements //////////////////////////////////////////////////////////////////////////////
 
 
-		$(document).on('click', 'a.ajax, a[data-target=ajax]', function () {
-			var $link = $(this).addClass('ajax-loading');
+		$(document)
+			.on('click', 'a.ajax, a[data-target=ajax]', function () {
+				var $link = $(this).addClass('ajax-loading');
 
-			$.ajax({
-				url: this.href,
-				complete: function () {
+				$.ajax({
+					url: this.href
+				}).always(function () {
 					$link.removeClass('ajax-loading');
-				}
+				});
+
+				return false;
 			});
 
-			return false;
-		});
-
-
 		$(document).on('submit', 'form.ajax, form[data-target=ajax]', function(e){
-			console.log(e);
-			var $form = $(this).addClass('ajax-loading');
+			var $form = $(this).addClass('ajax-loading'),
+				$clicked = $form.find('.ajax-clicked').removeClass('ajax-clicked'),
+				params = $form.serialize();
 
+			// include the button in the response if appropriate
+			if ($clicked.length > 0 && $clicked.prop('name')) {
+				params += (params.length > 0 ? '&' : '') + encodeURIComponent($clicked.prop('name'))
+					+ '=' + encodeURIComponent($clicked.val());
+			}
+
+			// send the request
 			$.ajax({
 				url:    $form.prop('action'),
 				type:   $form.prop('method'),
-				data:   $form.serialize(),
-			}).done(function () {
+				data:   params
+			}).always(function(){
 				$form.removeClass('ajax-loading');
-				$form.find('.ajax-loading').removeClass('ajax-loading');
+				$clicked.removeClass('ajax-loading');
 			});
 
 			return false;
-		});
-
-		// we usually want to show the loading indicator on the button instead of the whole form
-		$(document).on('click', 'form.ajax input[type=submit], form[data-target=ajax] input[type=submit]', function(){
-			$(this).addClass('ajax-loading');
+		})
+		.on('click', 'form.ajax input[type=submit], form[data-target=ajax] input[type=submit]', function(){
+			// this allows us to know which button (if any was clicked)
+			// usually, we expect there to be an indicator on the button itself
+			// and additionally, we'll want to send the name=val of this button in the response
+			$(this).addClass('ajax-loading ajax-clicked');
+			return true;
 		});
 
 
@@ -117,16 +127,15 @@
 				}
 			})
 			.ajaxStart(function () {
-				$(document.body).addClass('ajax-loading');
+				$('body').addClass('ajax-loading');
 			})
 			.ajaxStop(function () {
-				$(document.body).addClass('ajax-loading');
+				$('body').addClass('ajax-loading');
 			})
 		;
 
 
 		// handle ajax pulls ///////////////////////////////////////////////////////////////////////////////////////////
-		// TODO: This should probably be pulled out into a separate file
 
 
 		var pullWatches = {};

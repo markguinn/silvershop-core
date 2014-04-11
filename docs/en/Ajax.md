@@ -17,11 +17,14 @@ Shop has some built-in ajax functionality. It has the following goals/requiremen
 
 ## Client Side
 
-### Link Behaviours:
+### Ajax Behaviours:
 
 - Ajaxify link: class="ajax" or data-target="ajax"
+- Ajaxify form: class="ajax" or data-target="ajax"
 - Open in modal: data-target="modal" (not implemented yet)
-- While loading, the link and the document.body will have the class ajax-loading added (and removed when loading finished)
+- While loading, the link and the document.body will have the class ajax-loading added (and removed when loading
+  finished). On forms, both the form and the button clicked will receive the loading class.
+ 
 
 ### Updating Regions
 

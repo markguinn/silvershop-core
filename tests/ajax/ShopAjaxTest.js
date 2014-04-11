@@ -1,5 +1,8 @@
 (function($) {
 	describe('Shop Ajax', function(){
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 		describe('links', function(){
 			beforeEach(function(){
 				setFixtures(
@@ -8,6 +11,8 @@
 					'<a id="link3" href="/link3" data-target="modal">Test Button 3</a>' +
 					'<a id="link4" href="/link4">Test Button 4</a>'
 				);
+
+				$(document.body).removeClass('ajax-loading');
 			});
 
 			it('should make an ajax request given a.ajax', function(){
@@ -23,14 +28,13 @@
 			});
 
 			it('should add the ajax-loading class to the link and the body and take it away when completed', function(){
-				//expect($(document.body)).not.toHaveClass('ajax-loading');
+				// NOTE: it crashes my browser to use expect($('body')).toHaveClass(...) - or any variation i tried
 				expect($('#link1')).not.toHaveClass('ajax-loading');
+				expect(document.body.className).not.toMatch(/ajax-loading/);
 				$('#link1').click();
 				var request = mostRecentAjaxRequest();
-				//expect($(document.body)).toHaveClass('ajax-loading');
 				expect($('#link1')).toHaveClass('ajax-loading');
 				request.response(TestResponses.generic);
-				//expect($(document.body)).not.toHaveClass('ajax-loading');
 				expect($('#link1')).not.toHaveClass('ajax-loading');
 			});
 
@@ -43,6 +47,74 @@
 				expect(mostRecentAjaxRequest()).toBeNull();
 			});
 		});
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		describe('forms', function(){
+			beforeEach(function(){
+				setFixtures(
+					'<form id="form1" class="ajax" method="post" action="/contact">' +
+						'<input type="hidden" name="the" value="quick">' +
+						'<input type="text" name="brown" value="fox">' +
+						'<input type="checkbox" name="jumps" value="over" checked>' +
+						'<input type="checkbox" name="notpresent" value="hopefully">' +
+						'<textarea name="thelazy">DOG</textarea>' +
+						'<select name="natural"><option>selection</option><option selected>woman</option></select>' +
+						'<input id="form1submit" type="submit" name="right" value="Submit">' +
+						'<input type="submit" name="wrong" value="No touching">' +
+					'</form>' +
+					'<form id="form2" data-target="ajax" method="post" action="/contact">' +
+						'<input type="text" name="brown" value="weasel">' +
+						'<input id="form2submit" type="submit" name="right" value="Submit">' +
+					'</form>' +
+					'<form id="form3" method="post" action="/contact">' +
+						'<input type="text" name="brown" value="badger">' +
+						'<input id="form2submit" type="submit" name="right" value="Submit">' +
+					'</form>'
+				);
+			});
+
+			it('should add ajax-loading to both the form and the button and remove both when the request finishes', function(){
+				expect($('#form1')).not.toHaveClass('ajax-loading');
+				expect($('#form1submit')).not.toHaveClass('ajax-loading');
+
+				$('#form1submit').trigger('click');
+				var request = mostRecentAjaxRequest();
+				expect($('#form1')).toHaveClass('ajax-loading');
+				expect($('#form1submit')).toHaveClass('ajax-loading');
+				expect($('#form2')).not.toHaveClass('ajax-loading');
+
+				request.response(TestResponses.generic);
+				expect($('#form1')).not.toHaveClass('ajax-loading');
+				expect($('#form1submit')).not.toHaveClass('ajax-loading');
+				expect($('#form2')).not.toHaveClass('ajax-loading');
+			});
+
+			it('should ajaxify forms with the class "ajax"', function(){
+				$('#form1').trigger('submit');
+				var request = mostRecentAjaxRequest();
+				expect(request.params).toBe('the=quick&brown=fox&jumps=over&thelazy=DOG&natural=woman');
+				expect(request.method).toBe('POST');
+				expect(request.url).toMatch(/contact$/);
+				request.response(TestResponses.generic);
+			});
+
+			it('should include the submit button if used', function(){
+				$('#form1submit').trigger('click');
+				var request = mostRecentAjaxRequest();
+				expect(request.params).toBe('the=quick&brown=fox&jumps=over&thelazy=DOG&natural=woman&right=Submit');
+				request.response(TestResponses.generic);
+			});
+
+			it('should ajaxify forms with data-target="ajax"', function(){
+				$('#form2').trigger('submit');
+				var request = mostRecentAjaxRequest();
+				expect(request.params).toBe('brown=weasel');
+				request.response(TestResponses.generic);
+			});
+		});
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		describe('triggered events', function(){
 			var request, spyEvent2;
@@ -61,6 +133,8 @@
 				expect(spyEvent2.mostRecentCall.args[1]).toEqual(['a','b','c']);
 			});
 		});
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		describe('regions', function(){
 			beforeEach(function(){
@@ -86,6 +160,8 @@
 				expect($('#region3').html()).toBe('Replaced:<span>2+3</span>');
 			});
 		});
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		describe('ajax pull', function(){
 			beforeEach(function(){
@@ -185,6 +261,8 @@
 				expect($('#region3').html()).toBe('Replaced:3');
 			});
 		});
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		describe('ajax errors', function(){
 
