@@ -27,6 +27,9 @@
 		EVENTS_KEY:     'events',
 		REGIONS_KEY:    'regions',
 		MESSAGES_KEY:   'messages',
+
+		checkForFullPage: /<html|<body|<!doctype|<script/i,
+
 		statusCodes: {
 			100: 'Continue',
 			101: 'Switching Protocols',
@@ -121,6 +124,33 @@
 
 		// handle ajax responses ///////////////////////////////////////////////////////////////////////////////////////
 
+		var replaceRegion = function(html, key) {
+			var $region = $(html),
+				explicit = $('[data-ajax-region=' + key + ']'),
+				id = $region.length > 0 ? $region.prop('id') : '',
+				classes = ($region.length > 0 && $region[0].className)
+					? $region[0].className.replace(/^\s|\s$/, '').split(/\s+/)
+					: [];
+
+			if (explicit.length > 0) {
+				// If there is one (or more) element with a data-ajax-region attribute it
+				// means we know for sure it's a match to this region, usually because the
+				// watch was set up on that particular element.
+				explicit.html($region.html());
+			} else if (id) {
+				// second best is if the root element of the new content contains an id
+				$('#' + id).html($region.html());
+			} else if (classes.length > 0) {
+				// otherwise, we try to match by css classes
+				$('.' + classes.join('.')).html($region.html());
+			} else {
+				// finally we fail silently but leave a warning for the developer
+				if (typeof(console) != 'undefined' && typeof(console.warn) == 'function') {
+					console.warn('Region returned without class or id!');
+				}
+			}
+		}
+
 		$(document)
 			.ajaxComplete(function (event, xhr) {
 				var data = null;
@@ -130,35 +160,12 @@
 				} catch (e) {
 				}
 
-				if (data != null && typeof(data) == 'object') {
+				if (data != null && typeof(data) === 'object') {
 					// Replace regions
 					if (typeof(data[config.REGIONS_KEY]) === 'object') {
 						for (var key in data[config.REGIONS_KEY]) {
 							if (typeof(data[config.REGIONS_KEY][key]) === 'string') {
-								var $region = $(data[config.REGIONS_KEY][key]),
-									explicit = $('[data-ajax-region=' + key + ']'),
-									id = $region.length > 0 ? $region.prop('id') : '',
-									classes = ($region.length > 0 && $region[0].className)
-										? $region[0].className.replace(/^\s|\s$/, '').split(/\s+/)
-										: [];
-
-								if (explicit.length > 0) {
-									// If there is one (or more) element with a data-ajax-region attribute it
-									// means we know for sure it's a match to this region, usually because the
-									// watch was set up on that particular element.
-									explicit.html($region.html());
-								} else if (id) {
-									// second best is if the root element of the new content contains an id
-									$('#' + id).html($region.html());
-								} else if (classes.length > 0) {
-									// otherwise, we try to match by css classes
-									$('.' + classes.join('.')).html($region.html());
-								} else {
-									// finally we fail silently but leave a warning for the developer
-									if (typeof(console) != 'undefined' && typeof(console.warn) == 'function') {
-										console.warn('Region returned without class or id!');
-									}
-								}
+								replaceRegion(data[config.REGIONS_KEY][key], key);
 							}
 						}
 					}
@@ -178,135 +185,138 @@
 							$(document).trigger('statusmessage', message);
 						}
 					}
-				} else {
+				} else if (xhr.status === 200 && xhr.responseText.indexOf('<') > -1) {
+					// Otherwise, if we got some html, try to insert it as a region
+					// This is mainly used with form validation, which is somewhat hardcoded in Silverstripe
+					replaceRegion(xhr.responseText, 'UnidentifiedRegion');
+				} else if (xhr.status >= 400) {
 					// If there was no understandable payload AND the status code is an error,
 					// we need to try to guess at a status message and display it to the user
-					if (xhr.status >= 400) {
-						// default to the official status description
-						var msg = config.statusCodes[xhr.status];
-						if (typeof(msg) === 'undefined') msg = 'Unknown Error';
+					// default to the official status description
+					var msg = config.statusCodes[xhr.status];
+					if (typeof(msg) === 'undefined') msg = 'Unknown Error';
 
-						// if the body is present and doesn't look too much like a full html page, use that instead
-						if (typeof(xhr.responseText) === 'string' && xhr.responseText.length > 0) {
-							var pageCheck = /<html|<body|<!doctype|<script/i;
-							if (!pageCheck.test(xhr.responseText)) {
-								msg = xhr.responseText;
-							}
+					// if the body is present and doesn't look too much like a full html page, use that instead
+					if (typeof(xhr.responseText) === 'string' && xhr.responseText.length > 0) {
+						if (!config.checkForFullPage.test(xhr.responseText)) {
+							msg = xhr.responseText;
 						}
-
-						// trigger the status message
-						$(document).trigger('statusmessage', {content:msg, type:'error'});
 					}
+
+					// trigger the status message
+					$(document).trigger('statusmessage', {content:msg, type:'error'});
 				}
 			})
 			.ajaxStart(function () {
 				$('body').addClass('ajax-loading');
 			})
 			.ajaxStop(function () {
-				$('body').addClass('ajax-loading');
+				$('body').removeClass('ajax-loading');
 			})
 		;
-
-		// handle ajax pulls ///////////////////////////////////////////////////////////////////////////////////////////
-
-		var pullWatches = {};
-
-		/**
-		 * Converts url to an absolute url among other things.
-		 * @param {string} url
-		 * @returns {string}
-		 */
-		var normaliseURL = function (url) {
-			return $('<a></a>').prop('href', url).prop('search', '').prop('hash', '').prop('href').replace('?#', '');
-		};
-
-		/**
-		 * Adds a watch to the existing list.
-		 * Cleans up the url pattern to make it easier to match.
-		 * @param {string} url
-		 * @param {string} region
-		 * @param {jQuery} target
-		 */
-		var addWatch = function (url, region, target) {
-			url = normaliseURL(url);
-			if (typeof(pullWatches[url]) == 'undefined') pullWatches[url] = [];
-			pullWatches[url].push(region);
-
-			// If the target is not document, set data-ajax-region attribute
-			// so it is cemented as the recipient of that region
-			if (target && target.length == 1 && target[0].nodeName != '#document') {
-				target.attr('data-ajax-region', region);
-			}
-		};
-
-		/**
-		 * Checks if the given url matches the pattern.
-		 * @param {string} url
-		 * @param {string} pattern
-		 * @returns {boolean}
-		 */
-		var doesUrlMatch = function (url, pattern) {
-			if (pattern.indexOf('*') > -1) {
-				var re = new RegExp(pattern.replace('.', '\\.').replace('*', '.*'));
-				return re.test(url);
-			} else {
-				return url === pattern;
-			}
-		};
-
-		/**
-		 * Adds a watch for ajax requests.
-		 *
-		 * @param {object|string} urls
-		 * @param {string} region [optional]
-		 * @returns {*}
-		 */
-		$.fn.pullRegionForURL = function (urls, region) {
-			// this is a more user friendly interface if you only have one url to watch
-			if (typeof(urls) == 'string') {
-				addWatch(urls, region, this);
-				return this;
-			}
-
-			if (typeof(urls) == 'object') {
-				for (var url in urls) {
-					if (typeof(urls[url]) == 'object') {
-						for (var k in urls[url]) addWatch(url, urls[url][k], this);
-					} else {
-						addWatch(url, urls[url], this);
-					}
-				}
-			}
-			return this;
-		};
-
-		/**
-		 * Clear all ajax request watches
-		 */
-		$.fn.clearPullRegions = function () {
-			pullWatches = {};
-			return this;
-		};
-
-		// Watch the outgoing requests and add headers as needed
-		$.ajaxPrefilter(function (options, originalOptions, jqXHR) {
-			var regions = [],
-				checkUrl = normaliseURL(options.url);
-
-			// see if there are any matches
-			for (var urlPattern in pullWatches) {
-				if (doesUrlMatch(checkUrl, urlPattern)) {
-					regions = regions.concat(pullWatches[urlPattern]);
-				}
-			}
-
-			// if so, add the appropriate header
-			if (regions.length > 0) {
-				if (typeof(options.headers) != 'object') options.headers = {};
-				options.headers['X-Pull-Regions'] = regions.join(',');
-			}
-		});
 	});
+
+
+	// handle ajax pulls ///////////////////////////////////////////////////////////////////////////////////////////
+
+	var pullWatches = {};
+
+	/**
+	 * Converts url to an absolute url among other things.
+	 * @param {string} url
+	 * @returns {string}
+	 */
+	var normaliseURL = function (url) {
+		return $('<a></a>').prop('href', url).prop('search', '').prop('hash', '').prop('href').replace('?#', '');
+	};
+
+	/**
+	 * Adds a watch to the existing list.
+	 * Cleans up the url pattern to make it easier to match.
+	 * @param {string} url
+	 * @param {string} region
+	 * @param {jQuery} target
+	 */
+	var addWatch = function (url, region, target) {
+		url = normaliseURL(url);
+		if (typeof(pullWatches[url]) == 'undefined') pullWatches[url] = [];
+		pullWatches[url].push(region);
+
+		// If the target is not document, set data-ajax-region attribute
+		// so it is cemented as the recipient of that region
+		if (target && target.length == 1 && target[0].nodeName != '#document') {
+			target.attr('data-ajax-region', region);
+		}
+	};
+
+	/**
+	 * Checks if the given url matches the pattern.
+	 * @param {string} url
+	 * @param {string} pattern
+	 * @returns {boolean}
+	 */
+	var doesUrlMatch = function (url, pattern) {
+		if (pattern.indexOf('*') > -1) {
+			var re = new RegExp(pattern.replace('.', '\\.').replace('*', '.*'));
+			return re.test(url);
+		} else {
+			return url === pattern;
+		}
+	};
+
+	/**
+	 * Adds a watch for ajax requests.
+	 *
+	 * @param {object|string} urls
+	 * @param {string} region [optional]
+	 * @returns {*}
+	 */
+	$.fn.pullRegionForURL = function (urls, region) {
+		// this is a more user friendly interface if you only have one url to watch
+		if (typeof(urls) == 'string') {
+			addWatch(urls, region, this);
+			return this;
+		}
+
+		if (typeof(urls) == 'object') {
+			for (var url in urls) {
+				if (typeof(urls[url]) == 'object') {
+					for (var k in urls[url]) addWatch(url, urls[url][k], this);
+				} else {
+					addWatch(url, urls[url], this);
+				}
+			}
+		}
+		return this;
+	};
+
+	/**
+	 * Clear all ajax request watches
+	 */
+	$.fn.clearPullRegions = function () {
+		pullWatches = {};
+		return this;
+	};
+
+	// Watch the outgoing requests and add headers as needed
+	$.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+		var regions = [],
+			checkUrl = normaliseURL(options.url);
+
+		// see if there are any matches
+		for (var urlPattern in pullWatches) {
+			if (doesUrlMatch(checkUrl, urlPattern)) {
+				regions = regions.concat(pullWatches[urlPattern]);
+			}
+		}
+
+		// if so, add the appropriate header
+		if (regions.length > 0) {
+			if (typeof(options.headers) != 'object') options.headers = {};
+			options.headers['X-Pull-Regions'] = regions.join(',');
+		}
+	});
+
 
 	// Automatically set up pulls by data-ajax-watch
 	$(window).on('load', function () {

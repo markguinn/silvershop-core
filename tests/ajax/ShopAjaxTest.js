@@ -152,13 +152,25 @@
 				expect($('#region1').html()).toBe('Replaced:1');
 			});
 
-			it('should replaces multiple regions if needed', function(){
+			it('should replace multiple regions if needed', function(){
 				$.ajax({url:'/'});
 				var request = mostRecentAjaxRequest();
 				request.response(TestResponses.pushManyRegions);
 				expect($('#region2').html()).toBe('Replaced:<span>2+3</span>');
 				expect($('#region3').html()).toBe('Replaced:<span>2+3</span>');
 			});
+
+			// I'm not 100% sure this this the right way to go, but Form::getValidationErrorResponse
+			// is hardcoded to return the form html OR (given an Accept: application/json header
+			// return a fair cryptic and specific response). This makes it pretty easy to catch
+			// those and display something that does work.
+			it('should treat a simple html response as a region', function(){
+				$.ajax({url:'/'});
+				var request = mostRecentAjaxRequest();
+				request.response(TestResponses.pushImplicitly);
+				expect($('#region1').html()).toBe('Sneaky:1');
+			});
+
 		});
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////

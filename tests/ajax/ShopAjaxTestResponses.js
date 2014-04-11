@@ -45,6 +45,11 @@ var TestResponses = {
 		})
 	},
 
+	pushImplicitly: {
+		status: 200,
+		responseText: '<div id="region1">Sneaky:1</div>'
+	},
+
 	pullLocal: {
 		status: 200,
 		responseText: JSON.stringify({
