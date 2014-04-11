@@ -19,17 +19,23 @@
 		factory(root.jQuery);
 	}
 }(this, function ($) {
-	var EVENTS_KEY = 'events',
-		REGIONS_KEY = 'regions';
+
+	// Plugins and configuration ///////////////////////////////////////////////////////////////////////////////////////
+
+	// TODO: there needs to be an easy way to override these globally
+	var config = {
+		EVENTS_KEY:     'events',
+		REGIONS_KEY:    'regions',
+		MESSAGES_KEY:   'messages',
+	};
+
 
 	$(document).ready(function () {
 
-
 		// handle automatic ajax elements //////////////////////////////////////////////////////////////////////////////
 
-
 		$(document)
-			.on('click', 'a.ajax, a[data-target=ajax]', function () {
+			.on('click', 'a.ajax, a[data-target=ajax]', function() { // Links
 				var $link = $(this).addClass('ajax-loading');
 
 				$.ajax({
@@ -39,42 +45,40 @@
 				});
 
 				return false;
-			});
+			})
+			.on('submit', 'form.ajax, form[data-target=ajax]', function(){ // Forms
+				var $form = $(this).addClass('ajax-loading'),
+					$clicked = $form.find('.ajax-clicked').removeClass('ajax-clicked'),
+					params = $form.serialize();
 
-		$(document).on('submit', 'form.ajax, form[data-target=ajax]', function(e){
-			var $form = $(this).addClass('ajax-loading'),
-				$clicked = $form.find('.ajax-clicked').removeClass('ajax-clicked'),
-				params = $form.serialize();
+				// include the button in the response if appropriate
+				if ($clicked.length > 0 && $clicked.prop('name')) {
+					params += (params.length > 0 ? '&' : '') + encodeURIComponent($clicked.prop('name'))
+						+ '=' + encodeURIComponent($clicked.val());
+				}
 
-			// include the button in the response if appropriate
-			if ($clicked.length > 0 && $clicked.prop('name')) {
-				params += (params.length > 0 ? '&' : '') + encodeURIComponent($clicked.prop('name'))
-					+ '=' + encodeURIComponent($clicked.val());
-			}
+				// send the request
+				$.ajax({
+					url:    $form.prop('action'),
+					type:   $form.prop('method'),
+					data:   params
+				}).always(function(){
+					$form.removeClass('ajax-loading');
+					$clicked.removeClass('ajax-loading');
+				});
 
-			// send the request
-			$.ajax({
-				url:    $form.prop('action'),
-				type:   $form.prop('method'),
-				data:   params
-			}).always(function(){
-				$form.removeClass('ajax-loading');
-				$clicked.removeClass('ajax-loading');
-			});
-
-			return false;
-		})
-		.on('click', 'form.ajax input[type=submit], form[data-target=ajax] input[type=submit]', function(){
-			// this allows us to know which button (if any was clicked)
-			// usually, we expect there to be an indicator on the button itself
-			// and additionally, we'll want to send the name=val of this button in the response
-			$(this).addClass('ajax-loading ajax-clicked');
-			return true;
-		});
-
+				return false;
+			})
+			.on('click', 'form.ajax input[type=submit], form[data-target=ajax] input[type=submit]', function(){ // Form buttons
+				// this allows us to know which button (if any was clicked)
+				// usually, we expect there to be an indicator on the button itself
+				// and additionally, we'll want to send the name=val of this button in the response
+				$(this).addClass('ajax-loading ajax-clicked');
+				return true;
+			})
+		;
 
 		// handle ajax responses ///////////////////////////////////////////////////////////////////////////////////////
-
 
 		$(document)
 			.ajaxComplete(function (event, xhr, ajaxOptions) {
@@ -87,10 +91,10 @@
 
 				if (data != null && typeof(data) == 'object') {
 					// Replace regions
-					if (typeof(data[REGIONS_KEY]) === 'object') {
-						for (var key in data[REGIONS_KEY]) {
-							if (typeof(data[REGIONS_KEY][key]) === 'string') {
-								var $region = $(data[REGIONS_KEY][key]),
+					if (typeof(data[config.REGIONS_KEY]) === 'object') {
+						for (var key in data[config.REGIONS_KEY]) {
+							if (typeof(data[config.REGIONS_KEY][key]) === 'string') {
+								var $region = $(data[config.REGIONS_KEY][key]),
 									explicit = $('[data-ajax-region=' + key + ']'),
 									id = $region.length > 0 ? $region.prop('id') : '',
 									classes = ($region.length > 0 && $region[0].className)
@@ -119,9 +123,18 @@
 					}
 
 					// Trigger events
-					if (typeof(data[EVENTS_KEY]) === 'object') {
-						for (var eventName in data[EVENTS_KEY]) {
-							$(document).trigger(eventName, [data[EVENTS_KEY][eventName]]);
+					if (typeof(data[config.EVENTS_KEY]) === 'object') {
+						for (var eventName in data[config.EVENTS_KEY]) {
+							$(document).trigger(eventName, [data[config.EVENTS_KEY][eventName]]);
+						}
+					}
+
+					// Show messages
+					if ($.isArray(data[config.MESSAGES_KEY])) {
+						var messages = data[config.MESSAGES_KEY];
+						for (var i = 0; i < messages.length; i++) {
+							var message = typeof(messages[i]) == 'string' ? {content:message[i]} : messages[i];
+							$(document).trigger('statusmessage', message);
 						}
 					}
 				}
@@ -134,9 +147,7 @@
 			})
 		;
 
-
 		// handle ajax pulls ///////////////////////////////////////////////////////////////////////////////////////////
-
 
 		var pullWatches = {};
 

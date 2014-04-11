@@ -24,9 +24,22 @@ Shop has some built-in ajax functionality. It has the following goals/requiremen
 - Open in modal: data-target="modal" (not implemented yet)
 - While loading, the link and the document.body will have the class ajax-loading added (and removed when loading
   finished). On forms, both the form and the button clicked will receive the loading class.
- 
 
-### Updating Regions
+
+### Status Messages:
+
+Status messages can be triggered on either the client or the server. In both cases this is triggered by a
+'statusmessage' event on the document object. The event payload can be either a string or an object (for a
+single message) or an array (for multiple messages). If an object is used the form is: `{content:'Operation failed', type:'bad'}`
+where 'type' can be anything. For the default provider 'type' is added to the message as a CSS class.
+
+A very basic implementation is provided which handles this event. To use it just include statusmessage.default.js
+with your page. It should be very easy to write connectors for any of the many libraries and plugins out there
+that display these types of messages. Just catch the 'statusmessage' event on the document and handle the
+three types of input correctly (string, object, array).
+
+
+### Updating Regions:
 
 The server can push different regions of the page (denoted by SS template name). The client can also "pull"
 regions by adding an X-Pull-Regions header or __regions__ GET parameter to the request. The easiest way to
@@ -122,6 +135,20 @@ class ShoppingCartAjax extends Extension {
 		}
 	}
 }
+```
+
+### Status Messages
+
+Examples of sending status messages in a response:
+
+```php
+$response->triggerEvent('statusmessage', 'Simple message');
+$response->triggerEvent('statusmessage', array('content' => 'Something bad', 'type' => 'bad'));
+$response->triggerEvent('statusmessage', array(
+	'Multiple messages'
+	'Message #2',
+	array('content' => 'Mixed messages', type => 'good'),
+));
 ```
 
 

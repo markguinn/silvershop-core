@@ -264,8 +264,80 @@
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+		describe('generic status message provider', function(){
+			afterEach(function(){
+				$('.statusMessage').remove();
+			});
+
+			it('should display a div when the message event is triggered', function(){
+				$(document).trigger('statusmessage', {content:'Test 123'});
+				expect($('body > .statusMessage')).toExist();
+			});
+
+			it('should use the specified container if present', function(){
+				setFixtures('<div id="StatusMessages"></div>');
+				$(document).trigger('statusmessage', {content:'Test 123'});
+				expect($('#StatusMessages > .statusMessage')).toExist();
+			});
+
+			it('should hide the message when clicked on', function(){
+				var done = false;
+				runs(function(){
+					$(document).trigger('statusmessage', {content:'Test 123'});
+					$('.statusMessage').trigger('click');
+					setTimeout(function(){ done=true; }, 500);
+				});
+				waitsFor(function(){ return done; });
+				expect($('.statusMessage')).not.toExist();
+			});
+
+			it('should allow multiple messages at once', function(){
+				$(document).trigger('statusmessage', {content:'Test 1'});
+				$(document).trigger('statusmessage', {content:'Test 2'});
+				$(document).trigger('statusmessage', {content:'Test 3'});
+				expect($('.statusMessage').length).toBe(3);
+			});
+
+			it('should use different classes for different types of messages', function(){
+				$(document).trigger('statusmessage', {content:'Test 1', type:'good'});
+				$(document).trigger('statusmessage', {content:'Test 2', type:'bad'});
+				$(document).trigger('statusmessage', {content:'Test 3', type:'ugly'});
+				expect($('.statusMessage.good')).toExist();
+				expect($('.statusMessage.good')).toHaveHtml('Test 1');
+				expect($('.statusMessage.bad')).toExist();
+				expect($('.statusMessage.bad')).toHaveHtml('Test 2');
+				expect($('.statusMessage.ugly')).toExist();
+			});
+
+			it('should handle a string as the input', function(){
+				$(document).trigger('statusmessage', 'Simplest form');
+				expect($('.statusMessage')).toHaveHtml('Simplest form');
+			});
+
+			it('should handle an array as input', function(){
+				// NOTE: when passing an array directly to trigger we have to double up the array or it will
+				// be interpreted as parameters
+				$(document).trigger('statusmessage', [['Simple 1', 'Simple 2', {content:'Mixed 3', type:'mixed'}]]);
+				expect($('.statusMessage').length).toBe(3);
+				expect($('.statusMessage.mixed')).toExist();
+			});
+
+			it('should trigger status messages from the ajax response', function(){
+				$.ajax({url:'/'});
+				var request = mostRecentAjaxRequest();
+				request.response(TestResponses.messages);
+				expect($('.statusMessage.good')).toExist();
+				expect($('.statusMessage.good')).toHaveHtml('Test 1');
+				expect($('.statusMessage.bad')).toExist();
+				expect($('.statusMessage.bad')).toHaveHtml('Test 2');
+			});
+		});
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 		describe('ajax errors', function(){
 
 		});
+
 	});
 }(jQuery));

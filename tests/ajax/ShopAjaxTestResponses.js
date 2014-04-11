@@ -14,6 +14,18 @@ var TestResponses = {
 		})
 	},
 
+	messages: {
+		status: 200,
+		responseText: JSON.stringify({
+			events: {
+				statusmessage: [
+					{content:"Test 1", type:'good'},
+					{content:"Test 2", type:'bad'}
+				]
+			}
+		})
+	},
+
 	pushRegion: {
 		status: 200,
 		responseText: JSON.stringify({
