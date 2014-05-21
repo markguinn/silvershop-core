@@ -408,9 +408,9 @@ class ShoppingCart_Controller extends Controller{
 	
 	protected function buyableFromRequest(){
 		$request = $this->getRequest();
-		if(SecurityToken::is_enabled() && !SecurityToken::inst()->checkRequest($request)){
-			return $this->httpError(400, _t("ShoppingCart.CSRF", "Invalid security token, possible CSRF attack."));
-		}
+//		if(SecurityToken::is_enabled() && !SecurityToken::inst()->checkRequest($request)){
+//			return $this->httpError(400, _t("ShoppingCart.CSRF", "Invalid security token, possible CSRF attack."));
+//		}
 		$id = (int) $request->param('ID');
 		if(empty($id)){
 			//TODO: store error message
