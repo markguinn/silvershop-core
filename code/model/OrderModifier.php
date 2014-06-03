@@ -47,8 +47,11 @@ class OrderModifier extends OrderAttribute {
 	private static $singular_name = "Modifier";
 	private static $plural_name = "Modifiers";
 
-	//Causes known bug: https://github.com/silverstripe/silverstripe-framework/issues/1682
-	//private static $default_sort = "\"Sort\" ASC, \"Created\" ASC";
+	private static $default_sort = "\"OrderModifier\".\"Sort\" ASC, \"Created\" ASC";
+
+	private static $extensions = array(
+		"OrderModifierLazyLoadFix"
+	);
 
 	/**
 	* Specifies whether this modifier is always required in an order.
@@ -97,6 +100,10 @@ class OrderModifier extends OrderAttribute {
 	 * Check if the modifier should be in the cart.
 	 */
 	public function valid() {
+		$order = $this->Order();
+		if(!$order){
+			return false;
+		}
 		return true;
 	}
 
@@ -154,8 +161,16 @@ class OrderModifier extends OrderAttribute {
 		return false;
 	}
 
-	public function removeLink() {
-		return CheckoutPage_Controller::remove_modifier_link($this->ID);
+}
+
+/**
+ * Hack to fix issue with lazy loding
+ * @see https://github.com/silverstripe/silverstripe-framework/issues/1682
+ */
+class OrderModifierLazyLoadFix extends DataExtension{
+
+	public function augmentSQL(SQLQuery &$query) {
+		$query->addLeftJoin("OrderModifier", "\"OrderModifier\".\"ID\" = \"OrderAttribute\".\"ID\"");
 	}
 
 }

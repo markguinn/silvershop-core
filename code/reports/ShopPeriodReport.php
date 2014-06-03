@@ -6,7 +6,7 @@
 class ShopPeriodReport extends SS_Report{
 
 	protected $dataClass = 'Order';
-	protected $periodfield = "Created";
+	protected $periodfield = "\"Order\".\"Created\"";
 	protected $grouping = false;
 	protected $pagesize = 20;
 
@@ -28,7 +28,7 @@ class ShopPeriodReport extends SS_Report{
 			$fields->push(new DropdownField("Grouping","Group By",array(
 				"Year" => "Year",
 				"Month" => "Month",
-				"Week" => "Week",
+				//"Week" => "Week",
 				"Day" => "Day"
 			)));
 		}
@@ -64,47 +64,50 @@ class ShopPeriodReport extends SS_Report{
 				$dformats = array(
 					"Year" => "Y",
 					"Month" => "Y - F",
-					"Week" => "o - W",
+					//"Week" => "o - W",
 					"Day" =>	"d F Y"
 				);
 				$dformat = $dformats[$params['Grouping']];
-				$record->FilterPeriod = (empty($result["FilterPeriod"])) ? "uncategorised" : date($dformat, strtotime($result["FilterPeriod"]));
+				$pf = "FilterPeriod";
+				$record->FilterPeriod = empty($result[$pf]) ? "uncategorised" : date($dformat, strtotime($result[$pf]));
 			}
 		}
 		return $output;
 	}
 
 	public function query($params){
+		$filterperiod = $this->periodfield;
 		$query = new ShopReport_Query();
-		$query->selectField($this->periodfield, 'FilterPeriod');
+		$query->setSelect(array("FilterPeriod" => "MIN($filterperiod)"));
+
 		$query->setFrom('"' . $this->dataClass . '"');
 		$start = isset($params['StartPeriod']) && !empty($params['StartPeriod']) ? date('Y-m-d',strtotime($params["StartPeriod"])) : null;
 		$end = isset($params['EndPeriod']) && !empty($params['EndPeriod']) ? date('Y-m-d',strtotime($params["EndPeriod"]) + 86400) : null; //end day is inclusive
 		if($start && $end){
-			$query->addHaving("FilterPeriod BETWEEN '$start' AND '$end'");
+			$query->addWhere("$filterperiod BETWEEN '$start' AND '$end'");
 		}elseif($start){
-			$query->addHaving("FilterPeriod > '$start'");
+			$query->addWhere("$filterperiod > '$start'");
 		}elseif($end){
-			$query->addHaving("FilterPeriod <= '$end'");
+			$query->addWhere("$filterperiod <= '$end'");
 		}
 		if($start || $end){
-			$query->addHaving("FilterPeriod IS NOT NULL"); //only include paid orders when we are doing specific period searching
+			$query->addWhere("$filterperiod IS NOT NULL");
 		}
 		if($this->grouping){
 			switch($params['Grouping']){
 				case "Year":
-					$query->addGroupBy("YEAR(FilterPeriod)");
+					$query->addGroupBy($this->fd($filterperiod, '%Y'));
 					break;
 				case "Month":
 				default:
-					$query->addGroupBy("YEAR(FilterPeriod),MONTH(FilterPeriod)");
+					$query->addGroupBy($this->fd($filterperiod, '%Y').",".$this->fd($filterperiod, '%m'));
 					break;
-				case "Week":
-					$query->addGroupBy("YEAR(FilterPeriod),WEEK(FilterPeriod)");
-					break;
+				// case "Week":
+				// 	$query->addGroupBy($this->fd($filterperiod, '%Y').",CAST(".$this->fd($filterperiod, '%d')."/365 * 52, INTEGER)");
+				// 	break;
 				case "Day":
 					$query->setLimit("0,1000");
-					$query->addGroupBy("YEAR(FilterPeriod),MONTH(FilterPeriod),DAY(FilterPeriod)");
+					$query->addGroupBy($this->fd($filterperiod, '%Y').",".$this->fd($filterperiod, '%m').",".$this->fd($filterperiod, '%d'));
 					break;
 			}
 		}
@@ -117,7 +120,12 @@ class ShopPeriodReport extends SS_Report{
 		}else{
 			$query->setLimit($this->pagesize);
 		}
+
 		return $query;
+	}
+
+	protected function fd($date, $format){
+		return DB::getConn()->formattedDatetimeClause($date, $format);
 	}
 
 }

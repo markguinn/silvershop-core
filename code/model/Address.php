@@ -70,7 +70,7 @@ class Address extends DataObject{
 		$fields = new FieldList(
 			$this->getCountryField(),
 			$addressfield = TextField::create('Address', _t('Address.ADDRESS', 'Address')),
-			$address2field = TextField::create('AddressLine2', _t('Address.ADDRESSLINE2', '&nbsp;')),
+			$address2field = TextField::create('AddressLine2', _t('Address.ADDRESSLINE2', 'Address Line 2 (optional)')),
 			$cityfield = TextField::create('City', _t('Address.CITY', 'City')),
 			$statefield = TextField::create('State', _t('Address.STATE', 'State')),
 			$postcodefield = TextField::create('PostalCode', _t('Address.POSTALCODE', 'Postal Code')),
@@ -102,7 +102,15 @@ class Address extends DataObject{
 	 * Required fields can be customised via self::$required_fields
 	 */
 	public function getRequiredFields() {
-		$fields = $this->config()->required_fields;
+		$fields = self::config()->required_fields;
+		//hack to allow overriding arrays in ss config
+		if(self::$required_fields != $fields){
+			foreach(self::$required_fields as $requirement){
+				if(($key = array_search($requirement, $fields)) !== false) {
+				    unset($fields[$key]);
+				}
+			}
+		}
 		$this->extend('updateRequiredFields', $fields);
 		return $fields;
 	}
