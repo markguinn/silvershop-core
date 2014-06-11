@@ -4,7 +4,7 @@
 	<thead>
 		<tr>
 			<th scope="col" colspan="2">
-				<% with Order %><h2><% _t('AccountPage.ss.ORDER','Order') %> $Reference ($Created.Month $Created.DayOfMonth, $Created.Year)</h2><% end_with %>
+				<% with Order %><h2><% _t('AccountPage.ss.ORDER','Order') %> $Reference ($Placed.Format('F j, Y'))</h2><% end_with %>
 			</th>
 		</tr>
 	</thead>

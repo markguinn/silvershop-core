@@ -392,7 +392,7 @@ class ShoppingCart_Controller extends Controller{
 			return;
 		}else{
 			if ($showCart) {
-				$referrer = $_SERVER['HTTP_REFERER']; 
+				$referrer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '/';
 				Controller::curr()->redirect("$referrer?showcart=1");
 			} else {
 				Controller::curr()->redirectBack();
