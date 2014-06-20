@@ -634,7 +634,14 @@ class Order extends DataObject {
 	function getReference(){
 		return $this->getField('Reference') ? $this->getField('Reference') : $this->ID;
 	}
-	
+
+    /**
+     * @return string
+     */
+    function getTitle() {
+        return 'Order #' . $this->getReference();
+    }
+
 	/**
 	 * Return a link to the {@link CheckoutPage} instance
 	 * that exists in the database.
