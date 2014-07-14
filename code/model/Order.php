@@ -218,6 +218,17 @@ class Order extends DataObject {
 		$filters = $context->getFilters(); //get the array, to maniplulate name, and fullname seperately
 		$filters['DateFrom'] = GreaterThanFilter::create('Placed');
 		$filters['DateTo'] = LessThanFilter::create('Placed');
+
+        $filters['FirstName'] = new MultiFieldPartialMatchFilter('FirstName', false,
+            array('SplitWords'),
+            array(
+                'Surname',
+                'Member.FirstName', 'Member.Surname',
+                'BillingAddress.FirstName', 'BillingAddress.Surname',
+                'ShippingAddress.FirstName', 'ShippingAddress.Surname'
+            )
+        );
+
 		$context->setFilters($filters);
 
 		return $context;
