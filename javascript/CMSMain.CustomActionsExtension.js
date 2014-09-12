@@ -11,7 +11,7 @@
 					srcWindowPath = printWindow.opener.location.origin,
 					printWindowDoc = printWindow.document,
 					headEl = printWindowDoc.getElementsByTagName('head')[0],
-					logo = '<img class="logo" src="' + srcWindowPath + '/themes/daywind/images/layout/daywind-logo.png" />';
+					logo = '<img class="logo" src="' + srcWindowPath + '/' + this.data('logo') + '" />';
 					
 				headEl.innerHTML = '<link rel="stylesheet" type="text/css" href="' + srcWindowPath + '/shop/css/order_print.css" />';
 				printWindowDoc.body.innerHTML =  logo + '<h2>Invoice - ' + $orderHeading + '</h2><h4>' + $orderSubHeading + '</h4>' + $orderInfo;
