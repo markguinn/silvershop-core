@@ -89,6 +89,24 @@ class ShopMember extends DataExtension {
 	function memberLoggedIn(){
 		if(self::$login_joins_cart && $order = ShoppingCart::singleton()->current()){
 			$order->MemberID = $this->owner->ID;
+
+			// Move all order items from the previous cart into the current cart
+			$oldCart = Order::get()
+				->filter(array(
+					"Status"   => "Cart",
+					"MemberID" => $this->owner->ID,
+				))->exclude('ID', $order->ID)
+				->first();
+
+			if ($oldCart) {
+				foreach ($oldCart->Items() as $item) {
+					$item->OrderID = $order->ID;
+					$item->write();
+				}
+
+				$order->calculate();
+			}
+
 			$order->write();
 		}
 	}

@@ -53,27 +53,27 @@ class ShoppingCart{
 
 		$sessionid = Session::get(self::$cartid_session_name);
 
-		//if is set to associate member and order - look for existing cart
-		if(ShopMember::get_associate_to_current_order() && Member::currentUserID()){
-			if ($order = Order::get()->filter(array("Status"=>"Cart","MemberID"=>Member::currentUserID()))->first()) {
-				
-				$this->order = $order;
-
-				if ($sessionid && !empty($sessionid) && $sessionOrder = Order::get()->filter(array("Status"=>"Cart","ID"=>$sessionid))->first()) {
-					
-					if($sessionItems = $sessionOrder->Items()){
-						foreach($sessionItems as $sessionItem){
-							if($this->get($sessionItem->Buyable())) continue;
-							$this->add($sessionItem->Buyable(), $sessionItem->Quantity);
-						}
-					}
-				}
-				
-				// reset...?
-				Session::set(self::$cartid_session_name, $order->ID);
-				return $this->order;
-			}
-		}
+//		//if is set to associate member and order - look for existing cart
+//		if(ShopMember::get_associate_to_current_order() && Member::currentUserID()){
+//			if ($order = Order::get()->filter(array("Status"=>"Cart","MemberID"=>Member::currentUserID()))->first()) {
+//
+//				$this->order = $order;
+//
+//				if ($sessionid && !empty($sessionid) && $sessionOrder = Order::get()->filter(array("Status"=>"Cart","ID"=>$sessionid))->first()) {
+//
+//					if($sessionItems = $sessionOrder->Items()){
+//						foreach($sessionItems as $sessionItem){
+//							if($this->get($sessionItem->Buyable())) continue;
+//							$this->add($sessionItem->Buyable(), $sessionItem->Quantity);
+//						}
+//					}
+//				}
+//
+//				// reset...?
+//				Session::set(self::$cartid_session_name, $order->ID);
+//				return $this->order;
+//			}
+//		}
 
 		//find order by id saved to session (allows logging out and retaining cart contents)
 		if ($sessionid && !empty($sessionid) && $order = Order::get()->filter(array("Status"=>"Cart","ID"=>$sessionid))->first()) {
