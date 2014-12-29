@@ -16,8 +16,10 @@ abstract class AddressBookCheckoutComponent extends AddressCheckoutComponent{
 
 		if($existingaddressfields = $this->getExistingAddressFields()){
 			Requirements::javascript('shop/javascript/CheckoutPage.js');
+
 			// add the fields for a new address after the dropdown field
 			$existingaddressfields->merge($fields);
+
 			// group under a composite field (invisible by default) so we
 			// easily know which fields to show/hide
 			$label = _t("AddressBookCheckkoutComponent.{$this->addresstype}Address", "{$this->addresstype} Address");
@@ -44,7 +46,7 @@ abstract class AddressBookCheckoutComponent extends AddressCheckoutComponent{
 			$addressoptions['newaddress'] = 'Create new address';
 			$fieldtype = count($addressoptions) > 3 ? 'DropdownField' : 'OptionsetField';
 			$label = _t("AddressBookCheckoutComponent.Existing{$this->addresstype}Address", "Existing {$this->addresstype} Address");
-			
+
 			return new FieldList(
 				$fieldtype::create($this->addresstype."AddressID", $label,
 					$addressoptions,
