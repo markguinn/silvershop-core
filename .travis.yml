@@ -33,7 +33,8 @@ script: ./shop/tests/travis/run_build.sh
 after_script:
   - if [ "$COVERAGE" > 0 ] && [ "$TRAVIS_BRANCH" = "master" ]; then
   - cd shop
-  - ../vendor/bin/ocular code-coverage:upload -v --format=php-clover build/logs/coverage.xml
+  - ls -al
+  - ../vendor/bin/ocular code-coverage:upload -v --format=php-clover /home/travis/builds/ss/shop/build/logs/clover.xml
   - CODECLIMATE_REPO_TOKEN=1bda7e981e23a213cae7976d3cf7e93054cd28fca1547e7813eb4ef568cdea29 ../vendor/bin/test-reporter
   - fi
 

@@ -2,7 +2,7 @@
 if [ "$COVERAGE" = "1" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
 	mkdir shop/build
 	mkdir shop/build/logs
-	vendor/bin/phpunit -c shop/phpunit.xml.dist --coverage-clover shop/build/logs/coverage.xml
+	vendor/bin/phpunit -c shop/phpunit.xml.dist --coverage-clover shop/build/logs/clover.xml
 #if [ "$COVERAGE" = "1" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
 #	vendor/bin/phpunit -c shop/phpunit.xml.dist --testsuite Split1 --coverage-clover shop/coverage.xml
 #elif [ "$COVERAGE" = "2" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
