@@ -24,7 +24,6 @@
 	"require-dev": {
 		"guzzle/plugin-mock": "~3.1",
 		"phpunit/PHPUnit": "~3.7",
-		"codeclimate/php-test-reporter": "dev-master",
 		"scrutinizer/ocular": "dev-master"
 	},
 	"suggest" : {
