@@ -53,21 +53,22 @@ class Product extends Page implements Buyable {
 	private static $summary_fields = array(
 		'InternalItemID',
 		'Title',
-		'BasePrice',
+		'BasePrice.NiceOrEmpty',
 		'canPurchase'
 	);
 
 	private static $searchable_fields = array(
 		'InternalItemID',
 		'Title' => array("title" => 'Title'),
-		'BasePrice',
 		'Featured'
 	);
 
 	private static $field_labels = array(
 		'InternalItemID' => 'SKU',
 		'Title' => 'Title',
-		'BasePrice' => 'Price'
+		'BasePrice' => 'Price',
+		'BasePrice.NiceOrEmpty' => 'Price',
+		'canPurchase' => 'Purchasable'
 	);
 
 	private static $singular_name = "Product";
@@ -139,6 +140,15 @@ class Product extends Page implements Buyable {
 		$this->extend('updateCMSFields', $fields);
 
 		return $fields;
+	}
+
+	/**
+	 * Fix grid field heading displaying "page name"
+	 */
+	public function fieldLabels($includerelations = true) {
+		$labels = parent::fieldLabels($includerelations);
+		$labels['Title'] = "Title";
+		return $labels;
 	}
 
 	/**
