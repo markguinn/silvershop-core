@@ -30,11 +30,11 @@ before_script:
   - cd ~/builds/ss
 
 script:
-  - if [ "$COVERAGE" = 1 ]; then
+  - if [ "$COVERAGE" = "1" ]; then
   - vendor/bin/phpunit -c shop/phpunit.xml.dist --testsuite Split1 --coverage-clover=coverage.xml
-  - elif [ "$COVERAGE" = 2 ]; then
+  - elif [ "$COVERAGE" = "2" ]; then
   - vendor/bin/phpunit -c shop/phpunit.xml.dist --testsuite Split2 --coverage-clover=coverage.xml
-  - elif [ "$COVERAGE" = 3 ]; then
+  - elif [ "$COVERAGE" = "3" ]; then
   - vendor/bin/phpunit -c shop/phpunit.xml.dist --testsuite Split3 --coverage-clover=coverage.xml
   - else
   - vendor/bin/phpunit -c shop/phpunit.xml.dist
