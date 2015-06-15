@@ -1,6 +1,6 @@
 service_name: travis-ci
-src_dir: code
+src_dir: shop/code
 coverage_clover:
-  - coverage1.xml
-  - coverage2.xml
-  - coverage3.xml
+  - shop/coverage1.xml
+  - shop/coverage2.xml
+  - shop/coverage3.xml
