@@ -34,7 +34,9 @@ script: ./shop/tests/travis/run_build.sh
 after_script:
   - if [ "$COVERAGE" > 0 ]; then
   - cd shop
-  - ../vendor/bin/coveralls -v -c /home/travis/builds/ss/shop/.coveralls.yml
+  - cat ~/builds/ss/shop/coverage.xml
+  - find ~/builds
+  - ../vendor/bin/coveralls -v -c ~/builds/ss/shop/.coveralls.yml
   - fi
 
 notifications:
