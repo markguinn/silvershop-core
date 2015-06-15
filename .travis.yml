@@ -37,7 +37,7 @@ after_script:
   - cat ~/builds/ss/shop/coverage1.xml
   - cat ~/builds/ss/shop/coverage2.xml
   - cat ~/builds/ss/shop/coverage3.xml
-  - ../vendor/bin/coveralls -v -c ~/builds/ss/shop/.coveralls.yml
+  - ../vendor/bin/coveralls -v -c /home/travis/builds/ss/shop/.coveralls.yml
   - fi
 
 notifications:
