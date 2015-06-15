@@ -1,0 +1,6 @@
+service_name: travis-ci
+src_dir: code
+coverage_clover:
+  - coverage1.xml
+  - coverage2.xml
+  - coverage3.xml
