@@ -2,7 +2,7 @@ inherit: true
 tools:
   external_code_coverage:
     timeout: 9999
-    runs: 3
+    runs: 6
   php_analyzer:
     enabled: true
     config:
