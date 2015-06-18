@@ -1,8 +1,8 @@
 inherit: true
 tools:
   external_code_coverage:
-    timeout: 9999
-    runs: 6
+    timeout: 900
+    runs: 3
   php_analyzer:
     enabled: true
     config:
