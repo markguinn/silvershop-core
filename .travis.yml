@@ -33,16 +33,8 @@ before_script:
 script:
   - vendor/bin/phpunit -c shop/phpunit.xml.dist --testsuite Split1 --coverage-clover=../../coverage.xml
 
-#after_script:
-#  - if [ "$COVERAGE" != "0" ]; then
-#  - cd shop
-#  #- ../vendor/bin/coveralls -v -c /home/travis/builds/ss/shop/.coveralls.yml
-#  - fi
-
 after_success:
-  - ls -al ~/builds/ss/
-  - find ~/builds/ss/shop/
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -f /home/travis/coverage.xml
 
 notifications:
   webhooks:
