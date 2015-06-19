@@ -32,16 +32,11 @@ before_script:
 #script: ./shop/tests/travis/run_build.sh
 script:
   - vendor/bin/phpunit -c shop/phpunit.xml.dist --testsuite Split1 --coverage-clover=../../coverage.xml
-
-#after_script:
-#  - if [ "$COVERAGE" != "0" ]; then
-#  - cd shop
-#  #- ../vendor/bin/coveralls -v -c /home/travis/builds/ss/shop/.coveralls.yml
-#  - fi
+  - echo $PWD
+  - cat ../../coverage.xml
 
 after_success:
-  - ls -al ~/builds/ss/
-  - find ~/builds/ss/shop/
+  - find ~/ -name 'coverage.xml'
   - bash <(curl -s https://codecov.io/bash)
 
 notifications:
