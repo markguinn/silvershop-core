@@ -4,7 +4,7 @@ class CalculateProductPopularity extends BuildTask{
 
 	protected $title = "Calculate Product Sales Popularity";
 	protected $description = "Count up total sales quantites for each product";
-	
+
 	function run($request){
 		
 		if($request->getVar('via') == "php"){
@@ -21,7 +21,6 @@ class CalculateProductPopularity extends BuildTask{
 	 * 	product popularity = sum(1/order_age) * sum(item_quantity)
 	 */
 	function viasql(){
-		
 		foreach(array("_Live","") as $stage){
 			$sql =<<<SQL
 				UPDATE "Product$stage" SET "Popularity" = (
@@ -36,6 +35,7 @@ class CalculateProductPopularity extends BuildTask{
 						INNER JOIN "Order" ON "OrderAttribute"."OrderID" = "Order"."ID"
 					WHERE "SiteTree$stage"."ID" = "Product$stage"."ID"
 						AND "Order"."Paid" IS NOT NULL
+						AND "Order"."Placed" > DATE_SUB(now(), INTERVAL 30 DAY)
 					GROUP BY "Product$stage"."ID"
 				);
 SQL;
