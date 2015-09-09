@@ -290,9 +290,12 @@ class OrderForm extends Form {
 		$savableFields = $this->fields->saveableFields();
 		foreach($savableFields as $field){
 			$field->originalFieldName = $field->getName();
-			$field->setName($field->originalFieldName."_renamed");
+			if ($field->originalFieldName != 'SecurityID') {
+				$field->setName($field->originalFieldName."_renamed");
+			}
 		}
 		foreach($fieldList as $formfield => $modelfield){
+			if ($formfield == 'SecurityID') continue;
 			if(!is_int($formfield) && isset($savableFields[$formfield]) && $field = $savableFields[$formfield]){
 				$field->originalFieldName = $formfield;
 				$field->setName($modelfield);
