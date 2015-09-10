@@ -151,11 +151,11 @@ class ShoppingCart{
 	 */
 	 public function remove(Buyable $buyable,$quantity = null,$filter = array()){
 		$order = $this->current();
-		$order->extend("beforeRemove",$buyable,$quantity,$filter);
-		if(!$order){
-			return $this->error(_t("ShoppingCart.NOORDER","No current order."));
-		}
-		$item = $this->get($buyable,$filter);
+		 if(!$order){
+			 return $this->error(_t("ShoppingCart.NOORDER","No current order."));
+		 }
+		 $order->extend("beforeRemove",$buyable,$quantity,$filter);
+		 $item = $this->get($buyable,$filter);
 		if(!$item){
 			return false;
 		}
